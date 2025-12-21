@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, GraduationCap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import { cn } from "@/lib/utils";
 
 type Message = {
   role: "user" | "assistant";
@@ -14,7 +16,7 @@ export const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm UniAssist AI, your college and library support assistant. How can I help you today? You can ask me about admissions, academics, library services, campus facilities, and more!",
+      content: "Welcome to **Periyar University**! I'm UniAssist AI, your dedicated campus assistant. I can help you with:\n\n- 📚 Admissions & Academic Programs\n- 📖 Library Services & E-Resources\n- 🏠 Hostel & Campus Facilities\n- 💰 Fee Structure & Scholarships\n\nHow can I assist you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -129,71 +131,99 @@ export const ChatInterface = () => {
 
   const quickQuestions = [
     "What are the admission requirements?",
-    "Tell me about library services",
-    "What courses are available?",
-    "How do I apply for scholarships?",
+    "Tell me about hostel facilities",
+    "Library timings and rules",
+    "CDOE distance education programs",
   ];
 
   return (
-    <div className="flex flex-col h-[600px] max-h-[80vh] w-full max-w-3xl mx-auto bg-card rounded-2xl shadow-medium overflow-hidden border border-border">
+    <div className="flex flex-col h-[calc(100vh-2rem)] md:h-[calc(100vh-4rem)] max-h-[800px] w-full max-w-4xl mx-auto">
       {/* Chat Header */}
-      <div className="bg-hero-gradient px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center">
-            <Bot className="w-6 h-6 text-secondary" />
+      <div className="flex items-center gap-4 p-4 md:p-6 border-b border-slate-800/50">
+        <div className="relative">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-glow-orange">
+            <GraduationCap className="w-8 h-8 text-slate-950" />
           </div>
-          <div>
-            <h3 className="font-semibold text-primary-foreground">UniAssist AI</h3>
-            <p className="text-sm text-primary-foreground/70">College & Library Assistant</p>
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-slate-950 flex items-center justify-center">
+            <Sparkles className="w-3 h-3 text-slate-950" />
           </div>
-          <div className="ml-auto flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-primary-foreground/70">Online</span>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-slate-100">UniAssist AI</h2>
+          <div className="flex items-center gap-2 text-sm text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse-soft" />
+            <span>AI Knowledge Base Active</span>
           </div>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar">
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex items-start gap-3 animate-fade-in ${
+            className={cn(
+              "flex items-start gap-3 animate-in",
               message.role === "user" ? "flex-row-reverse" : ""
-            }`}
+            )}
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
                 message.role === "user"
-                  ? "bg-primary"
-                  : "bg-secondary"
-              }`}
+                  ? "bg-blue-600"
+                  : "bg-gradient-to-br from-orange-500 to-orange-600"
+              )}
             >
               {message.role === "user" ? (
-                <User className="w-4 h-4 text-primary-foreground" />
+                <User className="w-5 h-5 text-white" />
               ) : (
-                <Bot className="w-4 h-4 text-secondary-foreground" />
+                <Bot className="w-5 h-5 text-slate-950" />
               )}
             </div>
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+              className={cn(
+                "max-w-[80%] rounded-2xl px-4 py-3",
                 message.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-tr-sm"
-                  : "bg-muted text-foreground rounded-tl-sm"
-              }`}
+                  ? "bg-blue-600 text-white rounded-tr-sm"
+                  : "glass-dark rounded-tl-sm"
+              )}
             >
-              <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+              <div className={cn(
+                "text-sm leading-relaxed prose-sm",
+                message.role === "user" ? "text-white" : "text-slate-200"
+              )}>
+                <ReactMarkdown
+                  components={{
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                    li: ({ children }) => <li className="text-slate-300">{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold text-orange-400">{children}</strong>,
+                    a: ({ href, children }) => (
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+                        {children}
+                      </a>
+                    ),
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              </div>
             </div>
           </div>
         ))}
         {isLoading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex items-start gap-3 animate-fade-in">
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-              <Bot className="w-4 h-4 text-secondary-foreground" />
+          <div className="flex items-start gap-3 animate-in">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-slate-950" />
             </div>
-            <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
-              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            <div className="glass-dark rounded-2xl rounded-tl-sm px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
+                <span className="text-sm text-slate-400">Thinking...</span>
+              </div>
             </div>
           </div>
         )}
@@ -202,14 +232,14 @@ export const ChatInterface = () => {
 
       {/* Quick Questions */}
       {messages.length === 1 && (
-        <div className="px-4 pb-2">
-          <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
+        <div className="px-4 md:px-6 pb-2">
+          <p className="text-xs text-slate-500 mb-2">Quick questions:</p>
           <div className="flex flex-wrap gap-2">
             {quickQuestions.map((question, index) => (
               <button
                 key={index}
                 onClick={() => setInput(question)}
-                className="text-xs px-3 py-1.5 rounded-full bg-accent text-accent-foreground hover:bg-accent/80 transition-smooth"
+                className="text-xs px-3 py-2 rounded-full glass-dark text-slate-300 hover:text-orange-400 hover:border-orange-500/30 transition-all"
               >
                 {question}
               </button>
@@ -219,23 +249,22 @@ export const ChatInterface = () => {
       )}
 
       {/* Input Area */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border">
+      <form onSubmit={handleSubmit} className="p-4 md:p-6 border-t border-slate-800/50">
         <div className="flex gap-3 items-end">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about admissions, courses, library, and more..."
-            className="flex-1 min-h-[44px] max-h-32 px-4 py-3 rounded-xl bg-muted border-0 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-muted-foreground"
+            placeholder="Ask about admissions, courses, library, hostel..."
+            className="flex-1 min-h-[48px] max-h-32 px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 resize-none focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 text-sm text-slate-200 placeholder:text-slate-500 transition-all"
             rows={1}
             disabled={isLoading}
           />
           <Button
             type="submit"
-            variant="chat"
             size="icon"
-            className="h-11 w-11 rounded-xl flex-shrink-0"
+            className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-slate-950 shadow-glow-orange flex-shrink-0 transition-all"
             disabled={!input.trim() || isLoading}
           >
             {isLoading ? (
@@ -249,3 +278,5 @@ export const ChatInterface = () => {
     </div>
   );
 };
+
+export default ChatInterface;
