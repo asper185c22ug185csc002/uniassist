@@ -5,14 +5,21 @@ import {
   Globe, 
   ExternalLink, 
   FileText, 
-  Download,
   BookOpen,
   Database,
-  Filter
+  Filter,
+  Clock,
+  Users,
+  Phone,
+  Mail,
+  Headphones,
+  Download,
+  Video,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Physical Books Data
+// Physical Books Data - Representing library collection
 const physicalBooks = [
   { id: 1, title: "Advanced Engineering Mathematics", author: "Erwin Kreyszig", category: "Mathematics", available: true, location: "Section A-12" },
   { id: 2, title: "Principles of Economics", author: "N. Gregory Mankiw", category: "Economics", available: true, location: "Section B-05" },
@@ -22,24 +29,30 @@ const physicalBooks = [
   { id: 6, title: "Molecular Biology of the Cell", author: "Alberts et al.", category: "Biology", available: false, location: "Section C-11" },
   { id: 7, title: "Fundamentals of Physics", author: "Halliday & Resnick", category: "Physics", available: true, location: "Section A-07" },
   { id: 8, title: "Management Principles", author: "Peter Drucker", category: "Management", available: true, location: "Section B-09" },
+  { id: 9, title: "Tamil Literature", author: "Various Authors", category: "Tamil", available: true, location: "Section F-02" },
+  { id: 10, title: "Environmental Science", author: "Anubha Kaushik", category: "Environmental Science", available: true, location: "Section G-01" },
 ];
 
-// Digital Resources Data
+// Digital Resources Data - From official library website
 const digitalResources = [
-  { id: 1, title: "N-LIST", description: "National Library and Information Services Infrastructure for Scholarly Content", url: "https://nlist.inflibnet.ac.in/", type: "Database" },
-  { id: 2, title: "DELNET", description: "Developing Library Network - Inter-library loan and document delivery", url: "https://delnet.in/", type: "Network" },
-  { id: 3, title: "INFLIBNET", description: "Information and Library Network Centre", url: "https://www.inflibnet.ac.in/", type: "Portal" },
-  { id: 4, title: "NDL India", description: "National Digital Library of India - Million+ resources", url: "https://ndl.iitkgp.ac.in/", type: "Library" },
-  { id: 5, title: "JSTOR", description: "Digital library of academic journals, books, and primary sources", url: "https://www.jstor.org/", type: "Database" },
-  { id: 6, title: "IEEE Xplore", description: "Scientific and technical content published by IEEE", url: "https://ieeexplore.ieee.org/", type: "Database" },
-  { id: 7, title: "ShodhGanga", description: "Reservoir of Indian theses and dissertations", url: "https://shodhganga.inflibnet.ac.in/", type: "Repository" },
-  { id: 8, title: "e-PG Pathshala", description: "MHRD e-learning initiative for postgraduate courses", url: "https://epgp.inflibnet.ac.in/", type: "E-Learning" },
+  { id: 1, title: "E-BOOKS", description: "Access digital books across various disciplines", url: "https://www.periyaruniversity.ac.in/Library_Home/ebooks.html", type: "E-Books", icon: Book },
+  { id: 2, title: "E-Theses and Dissertations", description: "ShodhGanga repository of Indian theses and dissertations", url: "https://shodhganga.inflibnet.ac.in/handle/10603/2100", type: "Repository", icon: GraduationCap },
+  { id: 3, title: "Digital Repository", description: "University's institutional digital repository", url: "https://www.periyaruniversity.ac.in/Library_Home/digirep.html", type: "Repository", icon: Database },
+  { id: 4, title: "UGC-INFONET Digital Library", description: "UGC-INFONET consortium for e-resources", url: "https://www.periyaruniversity.ac.in/Library_Home/ugc.html", type: "Portal", icon: Globe },
+  { id: 5, title: "DELNET", description: "Developing Library Network for resource sharing and discovery", url: "https://discovery.delnet.in/", type: "Network", icon: Database },
+  { id: 6, title: "NPTEL", description: "National Programme on Technology Enhanced Learning", url: "https://nptel.ac.in/", type: "E-Learning", icon: Video },
+  { id: 7, title: "WebOPAC", description: "Online Public Access Catalog - Search library holdings", url: "http://14.139.186.90:8081/", type: "Catalog", icon: Search },
+  { id: 8, title: "Remote Access", description: "Knimbus platform for remote e-resource access", url: "https://periyaruniversity.new.knimbus.com/user#/home", type: "Portal", icon: Globe },
+  { id: 9, title: "Quillbot", description: "AI-powered writing and grammar tool", url: "https://quillbot.com/", type: "Tool", icon: FileText },
+  { id: 10, title: "Common Wealth of Learning", description: "Open educational resources from COL", url: "https://www.col.org/", type: "E-Learning", icon: BookOpen },
+  { id: 11, title: "N-LIST", description: "National Library and Information Services Infrastructure for Scholarly Content", url: "https://nlist.inflibnet.ac.in/", type: "Database", icon: Database },
+  { id: 12, title: "Library Brochure", description: "Download library information brochure (PDF)", url: "https://www.periyaruniversity.ac.in/Documents/2021/Library.pdf", type: "Document", icon: Download },
 ];
 
-const categories = ["All", "Mathematics", "Computer Science", "Physics", "Chemistry", "Biology", "Economics", "Management", "Political Science"];
+const categories = ["All", "Mathematics", "Computer Science", "Physics", "Chemistry", "Biology", "Economics", "Management", "Political Science", "Tamil", "Environmental Science"];
 
 export const LibraryCatalog = () => {
-  const [activeTab, setActiveTab] = useState<"physical" | "digital">("physical");
+  const [activeTab, setActiveTab] = useState<"physical" | "digital">("digital");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -64,24 +77,34 @@ export const LibraryCatalog = () => {
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-100 mb-2">Library Catalog</h1>
-        <p className="text-slate-400">Access physical books and digital e-resources</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-100 mb-2">University Library</h1>
+        <p className="text-slate-400">Periyar University Library - Established 1997</p>
+      </div>
+
+      {/* Library Stats */}
+      <div className="glass-dark rounded-2xl p-5 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-bold text-orange-400">98,482</p>
+            <p className="text-sm text-slate-400">Volumes</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-blue-400">124</p>
+            <p className="text-sm text-slate-400">Journals</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-green-400">13</p>
+            <p className="text-sm text-slate-400">Newspapers</p>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-purple-400">Open</p>
+            <p className="text-sm text-slate-400">Access System</p>
+          </div>
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setActiveTab("physical")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all",
-            activeTab === "physical"
-              ? "bg-gradient-to-r from-orange-500 to-orange-600 text-slate-950"
-              : "glass-dark text-slate-300 hover:text-slate-100"
-          )}
-        >
-          <Book className="w-5 h-5" />
-          Physical Books
-        </button>
         <button
           onClick={() => setActiveTab("digital")}
           className={cn(
@@ -93,6 +116,18 @@ export const LibraryCatalog = () => {
         >
           <Globe className="w-5 h-5" />
           Digital E-Resources
+        </button>
+        <button
+          onClick={() => setActiveTab("physical")}
+          className={cn(
+            "flex items-center gap-2 px-4 py-3 rounded-xl font-medium transition-all",
+            activeTab === "physical"
+              ? "bg-gradient-to-r from-orange-500 to-orange-600 text-slate-950"
+              : "glass-dark text-slate-300 hover:text-slate-100"
+          )}
+        >
+          <Book className="w-5 h-5" />
+          Physical Books
         </button>
       </div>
 
@@ -175,67 +210,141 @@ export const LibraryCatalog = () => {
               <p className="text-slate-400">No resources found matching your search</p>
             </div>
           ) : (
-            filteredResources.map((resource, index) => (
-              <a
-                key={resource.id}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="glass-dark rounded-xl p-5 hover:border-blue-500/30 transition-all group animate-in block"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    {resource.type === "Database" ? (
-                      <Database className="w-6 h-6 text-blue-400" />
-                    ) : resource.type === "E-Learning" ? (
-                      <BookOpen className="w-6 h-6 text-blue-400" />
-                    ) : resource.type === "Repository" ? (
-                      <FileText className="w-6 h-6 text-blue-400" />
-                    ) : (
-                      <Globe className="w-6 h-6 text-blue-400" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-slate-100 group-hover:text-blue-400 transition-colors">
-                        {resource.title}
-                      </h3>
-                      <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
+            filteredResources.map((resource, index) => {
+              const IconComponent = resource.icon;
+              return (
+                <a
+                  key={resource.id}
+                  href={resource.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass-dark rounded-xl p-5 hover:border-blue-500/30 transition-all group animate-in block"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                      <IconComponent className="w-6 h-6 text-blue-400" />
                     </div>
-                    <p className="text-sm text-slate-400 mt-1">{resource.description}</p>
-                    <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 mt-2">
-                      {resource.type}
-                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-slate-100 group-hover:text-blue-400 transition-colors">
+                          {resource.title}
+                        </h3>
+                        <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                      </div>
+                      <p className="text-sm text-slate-400 mt-1">{resource.description}</p>
+                      <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 mt-2">
+                        {resource.type}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))
+                </a>
+              );
+            })
           )}
         </div>
       )}
 
-      {/* Library Info */}
-      <div className="mt-8 glass-dark rounded-2xl p-6">
+      {/* Library Vision & Mission */}
+      <div className="mt-8 grid md:grid-cols-2 gap-4">
+        <div className="glass-dark rounded-2xl p-6">
+          <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-orange-400" />
+            Vision
+          </h3>
+          <p className="text-sm text-slate-400">
+            To develop the University Library a vibrant Resource Centre for supporting academics and 
+            research communities ensuring a knowledgeable and prosperous society.
+          </p>
+        </div>
+        <div className="glass-dark rounded-2xl p-6">
+          <h3 className="font-semibold text-slate-100 mb-3 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-blue-400" />
+            Mission
+          </h3>
+          <ul className="text-sm text-slate-400 space-y-1">
+            <li>• Support educational and research programmes</li>
+            <li>• Provide value added services to users</li>
+            <li>• Develop Institutional Repositories</li>
+            <li>• Introduce new technologies in the Library</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Library Sections */}
+      <div className="mt-6 glass-dark rounded-2xl p-6">
         <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-orange-400" />
+          <BookOpen className="w-5 h-5 text-purple-400" />
+          Library Sections
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {[
+            "Reference Section",
+            "Text Book Section",
+            "Competitive Exam Books",
+            "Theses & Dissertations",
+            "Back Volumes Section",
+            "Reprographic Section",
+            "Question Banks",
+            "Digital Library"
+          ].map((section) => (
+            <span
+              key={section}
+              className="text-sm px-3 py-1.5 rounded-full bg-slate-800/50 text-slate-300"
+            >
+              {section}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Library Info */}
+      <div className="mt-6 glass-dark rounded-2xl p-6">
+        <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-orange-400" />
           Library Information
         </h3>
         <div className="grid md:grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="text-slate-400 mb-1">Timings</p>
-            <p className="text-slate-200">Mon-Sat: 8:00 AM - 8:00 PM</p>
-            <p className="text-slate-200">Sun: 10:00 AM - 5:00 PM</p>
+            <p className="text-slate-400 mb-1">Services For</p>
+            <p className="text-slate-200">• P.G. Students</p>
+            <p className="text-slate-200">• M.Phil. Scholars</p>
+            <p className="text-slate-200">• Ph.D. Scholars</p>
+            <p className="text-slate-200">• Faculty Members</p>
+            <p className="text-slate-200">• Affiliated College Students</p>
           </div>
           <div>
             <p className="text-slate-400 mb-1">Borrowing Limit</p>
             <p className="text-slate-200">UG Students: 3 books (14 days)</p>
             <p className="text-slate-200">PG Students: 5 books (21 days)</p>
+            <p className="text-slate-200">Research Scholars: 8 books (30 days)</p>
           </div>
           <div>
-            <p className="text-slate-400 mb-1">Contact</p>
-            <p className="text-slate-200">library@periyaruniversity.ac.in</p>
-            <p className="text-slate-200">+91 4294 226 000</p>
+            <p className="text-slate-400 mb-1">Quick Links</p>
+            <a
+              href="https://www.periyaruniversity.ac.in/Library_Home/home.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Library Home <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://www.periyaruniversity.ac.in/Library_Home/services.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Services <ExternalLink className="w-3 h-3" />
+            </a>
+            <a
+              href="https://www.periyaruniversity.ac.in/Library_Home/contact.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Contact <ExternalLink className="w-3 h-3" />
+            </a>
           </div>
         </div>
       </div>
