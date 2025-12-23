@@ -33,7 +33,7 @@ export const MobileNav = () => {
                 className={cn(
                   "flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all",
                   isActive
-                    ? "text-orange-400"
+                    ? "text-blue-400"
                     : "text-slate-400 hover:text-slate-200"
                 )}
               >
@@ -41,7 +41,7 @@ export const MobileNav = () => {
                   className={cn(
                     "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
                     isActive
-                      ? "bg-orange-500/20"
+                      ? "bg-blue-500/20"
                       : "bg-transparent"
                   )}
                 >
