@@ -79,11 +79,12 @@ const schoolsAndDepartments = [
       { 
         name: "Computer Science", 
         url: "https://www.periyaruniversity.ac.in/Dept/csc.php",
-        courses: ["M.Sc. Computer Science", "M.C.A.", "M.Phil. Computer Science", "Ph.D. Computer Science"],
-        fees: { msc: "₹18,000/year", mca: "₹25,000/year", mphil: "₹20,000/year", phd: "₹22,000/year" },
+        courses: ["M.Sc. Computer Science", "M.Sc. Data Science", "M.C.A.", "M.Phil. Computer Science", "Ph.D. Computer Science"],
+        fees: { msc: "₹18,000/year", mscds: "₹25,000/year", mca: "₹25,000/year", mphil: "₹20,000/year", phd: "₹22,000/year" },
         rating: 4.7,
         reviews: 245,
-        placements: "92%"
+        placements: "92%",
+        highlights: ["AI & Machine Learning Lab", "Data Analytics Center", "Industry Partnerships with TCS, Infosys"]
       },
       { 
         name: "Library and Information Science", 
