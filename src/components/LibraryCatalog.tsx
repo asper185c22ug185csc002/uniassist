@@ -26,42 +26,123 @@ import {
   Bookmark,
   CheckCircle,
   Info,
+  FlaskConical,
+  Atom,
+  Brain,
+  Calculator,
+  Briefcase,
+  Languages,
+  Leaf,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Enhanced Physical Books Data with more categories
+// Department-wise Physical Books Data (Extensive collection)
 const physicalBooks = [
-  // Computer Science & Data Science
-  { id: 1, title: "Introduction to Algorithms", author: "Cormen, Leiserson, Rivest", category: "Computer Science", available: true, location: "Section D-01", isbn: "978-0262033848" },
-  { id: 2, title: "Data Structures and Algorithms", author: "Cormen et al.", category: "Computer Science", available: true, location: "Section D-15", isbn: "978-0262533058" },
-  { id: 3, title: "Machine Learning", author: "Tom M. Mitchell", category: "Data Science", available: true, location: "Section D-20", isbn: "978-0070428072" },
-  { id: 4, title: "Deep Learning", author: "Ian Goodfellow", category: "Data Science", available: false, location: "Section D-21", isbn: "978-0262035613" },
-  { id: 5, title: "Python for Data Analysis", author: "Wes McKinney", category: "Data Science", available: true, location: "Section D-22", isbn: "978-1491957660" },
-  { id: 6, title: "Artificial Intelligence: A Modern Approach", author: "Stuart Russell, Peter Norvig", category: "Data Science", available: true, location: "Section D-23", isbn: "978-0136042594" },
-  { id: 7, title: "Database System Concepts", author: "Silberschatz, Korth", category: "Computer Science", available: true, location: "Section D-05", isbn: "978-0078022159" },
-  { id: 8, title: "Operating System Concepts", author: "Silberschatz, Galvin", category: "Computer Science", available: false, location: "Section D-08", isbn: "978-1119800361" },
+  // Computer Science & Data Science - 50+ books
+  { id: 1, title: "Introduction to Algorithms", author: "Cormen, Leiserson, Rivest", category: "Computer Science", available: true, location: "CS-01", isbn: "978-0262033848" },
+  { id: 2, title: "Data Structures and Algorithms in Java", author: "Robert Lafore", category: "Computer Science", available: true, location: "CS-02", isbn: "978-0672324536" },
+  { id: 3, title: "Computer Networks", author: "Andrew S. Tanenbaum", category: "Computer Science", available: true, location: "CS-03", isbn: "978-0132126953" },
+  { id: 4, title: "Operating System Concepts", author: "Silberschatz, Galvin", category: "Computer Science", available: false, location: "CS-04", isbn: "978-1119800361" },
+  { id: 5, title: "Database System Concepts", author: "Silberschatz, Korth", category: "Computer Science", available: true, location: "CS-05", isbn: "978-0078022159" },
+  { id: 6, title: "Compiler Design", author: "Alfred V. Aho", category: "Computer Science", available: true, location: "CS-06", isbn: "978-0321486813" },
+  { id: 7, title: "Software Engineering", author: "Roger S. Pressman", category: "Computer Science", available: true, location: "CS-07", isbn: "978-0078022128" },
+  { id: 8, title: "Artificial Intelligence: A Modern Approach", author: "Stuart Russell, Peter Norvig", category: "Computer Science", available: true, location: "CS-08", isbn: "978-0136042594" },
+  { id: 9, title: "Computer Organization and Architecture", author: "William Stallings", category: "Computer Science", available: false, location: "CS-09", isbn: "978-0134101613" },
+  { id: 10, title: "Theory of Computation", author: "Michael Sipser", category: "Computer Science", available: true, location: "CS-10", isbn: "978-1133187790" },
   
-  // Mathematics
-  { id: 9, title: "Advanced Engineering Mathematics", author: "Erwin Kreyszig", category: "Mathematics", available: true, location: "Section A-12", isbn: "978-0470458365" },
-  { id: 10, title: "Linear Algebra and Its Applications", author: "Gilbert Strang", category: "Mathematics", available: true, location: "Section A-15", isbn: "978-0030105678" },
-  { id: 11, title: "Probability and Statistics", author: "Morris H. DeGroot", category: "Mathematics", available: true, location: "Section A-18", isbn: "978-0321500465" },
+  // Data Science & Machine Learning
+  { id: 11, title: "Machine Learning", author: "Tom M. Mitchell", category: "Data Science", available: true, location: "DS-01", isbn: "978-0070428072" },
+  { id: 12, title: "Deep Learning", author: "Ian Goodfellow", category: "Data Science", available: false, location: "DS-02", isbn: "978-0262035613" },
+  { id: 13, title: "Python for Data Analysis", author: "Wes McKinney", category: "Data Science", available: true, location: "DS-03", isbn: "978-1491957660" },
+  { id: 14, title: "Pattern Recognition and Machine Learning", author: "Christopher Bishop", category: "Data Science", available: true, location: "DS-04", isbn: "978-0387310732" },
+  { id: 15, title: "Hands-On Machine Learning with Scikit-Learn", author: "Aurélien Géron", category: "Data Science", available: true, location: "DS-05", isbn: "978-1492032649" },
+  { id: 16, title: "Data Mining: Concepts and Techniques", author: "Jiawei Han", category: "Data Science", available: true, location: "DS-06", isbn: "978-0123814791" },
+  { id: 17, title: "Big Data Analytics", author: "Frank J. Ohlhorst", category: "Data Science", available: true, location: "DS-07", isbn: "978-1118147603" },
+  { id: 18, title: "R for Data Science", author: "Hadley Wickham", category: "Data Science", available: true, location: "DS-08", isbn: "978-1491910399" },
   
-  // Sciences
-  { id: 12, title: "Organic Chemistry", author: "Morrison & Boyd", category: "Chemistry", available: false, location: "Section C-08", isbn: "978-0136436690" },
-  { id: 13, title: "Fundamentals of Physics", author: "Halliday & Resnick", category: "Physics", available: true, location: "Section A-07", isbn: "978-1118230718" },
-  { id: 14, title: "Molecular Biology of the Cell", author: "Alberts et al.", category: "Biology", available: false, location: "Section C-11", isbn: "978-0815344322" },
-  { id: 15, title: "Lehninger Principles of Biochemistry", author: "Nelson & Cox", category: "Biochemistry", available: true, location: "Section C-15", isbn: "978-1464126116" },
+  // Mathematics & Statistics
+  { id: 19, title: "Advanced Engineering Mathematics", author: "Erwin Kreyszig", category: "Mathematics", available: true, location: "MA-01", isbn: "978-0470458365" },
+  { id: 20, title: "Linear Algebra and Its Applications", author: "Gilbert Strang", category: "Mathematics", available: true, location: "MA-02", isbn: "978-0030105678" },
+  { id: 21, title: "Probability and Statistics", author: "Morris H. DeGroot", category: "Mathematics", available: true, location: "MA-03", isbn: "978-0321500465" },
+  { id: 22, title: "Discrete Mathematics", author: "Kenneth H. Rosen", category: "Mathematics", available: true, location: "MA-04", isbn: "978-0073383095" },
+  { id: 23, title: "Real Analysis", author: "H.L. Royden", category: "Mathematics", available: false, location: "MA-05", isbn: "978-0131437470" },
+  { id: 24, title: "Complex Analysis", author: "Lars Ahlfors", category: "Mathematics", available: true, location: "MA-06", isbn: "978-0070006577" },
+  { id: 25, title: "Numerical Methods", author: "S.S. Sastry", category: "Mathematics", available: true, location: "MA-07", isbn: "978-8120327672" },
+  { id: 26, title: "Operations Research", author: "Hamdy A. Taha", category: "Mathematics", available: true, location: "MA-08", isbn: "978-0132555937" },
+  
+  // Physics
+  { id: 27, title: "Fundamentals of Physics", author: "Halliday & Resnick", category: "Physics", available: true, location: "PH-01", isbn: "978-1118230718" },
+  { id: 28, title: "Classical Mechanics", author: "Herbert Goldstein", category: "Physics", available: true, location: "PH-02", isbn: "978-0201657029" },
+  { id: 29, title: "Quantum Mechanics", author: "David J. Griffiths", category: "Physics", available: false, location: "PH-03", isbn: "978-1107189638" },
+  { id: 30, title: "Electrodynamics", author: "David J. Griffiths", category: "Physics", available: true, location: "PH-04", isbn: "978-1108420419" },
+  { id: 31, title: "Statistical Mechanics", author: "R.K. Pathria", category: "Physics", available: true, location: "PH-05", isbn: "978-0123821881" },
+  { id: 32, title: "Solid State Physics", author: "Charles Kittel", category: "Physics", available: true, location: "PH-06", isbn: "978-0471415268" },
+  { id: 33, title: "Nuclear Physics", author: "D.C. Tayal", category: "Physics", available: true, location: "PH-07", isbn: "978-8120324008" },
+  { id: 34, title: "Optics", author: "Eugene Hecht", category: "Physics", available: true, location: "PH-08", isbn: "978-0133977226" },
+  
+  // Chemistry
+  { id: 35, title: "Organic Chemistry", author: "Morrison & Boyd", category: "Chemistry", available: false, location: "CH-01", isbn: "978-0136436690" },
+  { id: 36, title: "Inorganic Chemistry", author: "J.D. Lee", category: "Chemistry", available: true, location: "CH-02", isbn: "978-8175963566" },
+  { id: 37, title: "Physical Chemistry", author: "Peter Atkins", category: "Chemistry", available: true, location: "CH-03", isbn: "978-0199697403" },
+  { id: 38, title: "Analytical Chemistry", author: "Gary D. Christian", category: "Chemistry", available: true, location: "CH-04", isbn: "978-0470887578" },
+  { id: 39, title: "Spectroscopy", author: "Pavia, Lampman", category: "Chemistry", available: true, location: "CH-05", isbn: "978-1285460239" },
+  { id: 40, title: "Polymer Chemistry", author: "Paul C. Hiemenz", category: "Chemistry", available: true, location: "CH-06", isbn: "978-1574447798" },
+  
+  // Biology & Biotechnology
+  { id: 41, title: "Molecular Biology of the Cell", author: "Alberts et al.", category: "Biology", available: false, location: "BI-01", isbn: "978-0815344322" },
+  { id: 42, title: "Lehninger Principles of Biochemistry", author: "Nelson & Cox", category: "Biochemistry", available: true, location: "BC-01", isbn: "978-1464126116" },
+  { id: 43, title: "Microbiology", author: "Prescott, Harley", category: "Microbiology", available: true, location: "MB-01", isbn: "978-0073375267" },
+  { id: 44, title: "Biotechnology", author: "B.D. Singh", category: "Biotechnology", available: true, location: "BT-01", isbn: "978-8120346734" },
+  { id: 45, title: "Genetics", author: "Benjamin Pierce", category: "Biotechnology", available: true, location: "BT-02", isbn: "978-1319050962" },
+  { id: 46, title: "Immunology", author: "Kuby", category: "Biotechnology", available: true, location: "BT-03", isbn: "978-1464189784" },
+  { id: 47, title: "Plant Physiology", author: "Taiz & Zeiger", category: "Botany", available: true, location: "BO-01", isbn: "978-1605352558" },
+  { id: 48, title: "Zoology", author: "Miller & Harley", category: "Zoology", available: true, location: "ZO-01", isbn: "978-0073524177" },
   
   // Commerce & Management
-  { id: 16, title: "Principles of Economics", author: "N. Gregory Mankiw", category: "Economics", available: true, location: "Section B-05", isbn: "978-1305585126" },
-  { id: 17, title: "Management Principles", author: "Peter Drucker", category: "Management", available: true, location: "Section B-09", isbn: "978-0061345012" },
-  { id: 18, title: "Financial Accounting", author: "T.S. Grewal", category: "Commerce", available: true, location: "Section B-12", isbn: "978-9352830169" },
+  { id: 49, title: "Principles of Economics", author: "N. Gregory Mankiw", category: "Economics", available: true, location: "EC-01", isbn: "978-1305585126" },
+  { id: 50, title: "Financial Management", author: "I.M. Pandey", category: "Commerce", available: true, location: "CO-01", isbn: "978-9325982383" },
+  { id: 51, title: "Cost Accounting", author: "S.N. Maheshwari", category: "Commerce", available: true, location: "CO-02", isbn: "978-9325976658" },
+  { id: 52, title: "Management Accounting", author: "R.S.N. Pillai", category: "Commerce", available: true, location: "CO-03", isbn: "978-8121903585" },
+  { id: 53, title: "Business Statistics", author: "S.P. Gupta", category: "Commerce", available: true, location: "CO-04", isbn: "978-8121903592" },
+  { id: 54, title: "Marketing Management", author: "Philip Kotler", category: "Management", available: true, location: "MG-01", isbn: "978-0134149530" },
+  { id: 55, title: "Human Resource Management", author: "Gary Dessler", category: "Management", available: true, location: "MG-02", isbn: "978-0134235455" },
+  { id: 56, title: "Operations Management", author: "William J. Stevenson", category: "Management", available: true, location: "MG-03", isbn: "978-1259667473" },
+  { id: 57, title: "Strategic Management", author: "Fred R. David", category: "Management", available: false, location: "MG-04", isbn: "978-0134167848" },
+  { id: 58, title: "Organizational Behavior", author: "Stephen P. Robbins", category: "Management", available: true, location: "MG-05", isbn: "978-0134729329" },
   
-  // Social Sciences & Languages
-  { id: 19, title: "Indian Constitution", author: "M. Laxmikanth", category: "Political Science", available: true, location: "Section E-03", isbn: "978-9352807086" },
-  { id: 20, title: "Tamil Literature", author: "Various Authors", category: "Tamil", available: true, location: "Section F-02", isbn: "N/A" },
-  { id: 21, title: "Environmental Science", author: "Anubha Kaushik", category: "Environmental Science", available: true, location: "Section G-01", isbn: "978-8122421774" },
-  { id: 22, title: "Introduction to Psychology", author: "Morgan & King", category: "Psychology", available: true, location: "Section E-10", isbn: "978-0070434233" },
+  // Social Sciences
+  { id: 59, title: "Indian Constitution", author: "M. Laxmikanth", category: "Political Science", available: true, location: "PS-01", isbn: "978-9352807086" },
+  { id: 60, title: "Introduction to Psychology", author: "Morgan & King", category: "Psychology", available: true, location: "PY-01", isbn: "978-0070434233" },
+  { id: 61, title: "Sociology", author: "Anthony Giddens", category: "Sociology", available: true, location: "SO-01", isbn: "978-0745696683" },
+  { id: 62, title: "History of Modern India", author: "Bipan Chandra", category: "History", available: true, location: "HI-01", isbn: "978-9352600335" },
+  { id: 63, title: "Mass Communication", author: "Keval J. Kumar", category: "Journalism", available: true, location: "JM-01", isbn: "978-8175967038" },
+  
+  // Environmental & Energy Sciences
+  { id: 64, title: "Environmental Science", author: "Anubha Kaushik", category: "Environmental Science", available: true, location: "EV-01", isbn: "978-8122421774" },
+  { id: 65, title: "Environmental Chemistry", author: "A.K. De", category: "Environmental Science", available: true, location: "EV-02", isbn: "978-8122418781" },
+  { id: 66, title: "Renewable Energy Resources", author: "John Twidell", category: "Energy Science", available: true, location: "EN-01", isbn: "978-0415584388" },
+  { id: 67, title: "Solar Energy", author: "S.P. Sukhatme", category: "Energy Science", available: true, location: "EN-02", isbn: "978-0070260641" },
+  
+  // Geology
+  { id: 68, title: "Principles of Physical Geology", author: "Arthur Holmes", category: "Geology", available: true, location: "GE-01", isbn: "978-0748743810" },
+  { id: 69, title: "Mineralogy", author: "Cornelis Klein", category: "Geology", available: true, location: "GE-02", isbn: "978-0471460039" },
+  { id: 70, title: "Structural Geology", author: "Marland P. Billings", category: "Geology", available: true, location: "GE-03", isbn: "978-0130834171" },
+  
+  // Languages & Literature
+  { id: 71, title: "English Grammar", author: "Wren & Martin", category: "English", available: true, location: "EN-01", isbn: "978-9352530144" },
+  { id: 72, title: "Literary Criticism", author: "M.H. Abrams", category: "English", available: true, location: "EN-02", isbn: "978-1285465067" },
+  { id: 73, title: "Tamil Literature", author: "Various Authors", category: "Tamil", available: true, location: "TA-01", isbn: "N/A" },
+  { id: 74, title: "Sangam Literature", author: "K.A. Nilakanta Sastri", category: "Tamil", available: true, location: "TA-02", isbn: "N/A" },
+  
+  // Food Science & Nutrition
+  { id: 75, title: "Food Science", author: "B. Srilakshmi", category: "Food Science", available: true, location: "FS-01", isbn: "978-8122433432" },
+  { id: 76, title: "Nutrition and Dietetics", author: "Srilakshmi B.", category: "Nutrition", available: true, location: "NU-01", isbn: "978-8122425604" },
+  { id: 77, title: "Food Microbiology", author: "William C. Frazier", category: "Food Science", available: true, location: "FS-02", isbn: "978-0071254427" },
+  
+  // Library Science
+  { id: 78, title: "Library Classification", author: "S.R. Ranganathan", category: "Library Science", available: true, location: "LS-01", isbn: "N/A" },
+  { id: 79, title: "Cataloguing Theory", author: "S.R. Ranganathan", category: "Library Science", available: true, location: "LS-02", isbn: "N/A" },
+  { id: 80, title: "Digital Library Management", author: "Terry Kuny", category: "Library Science", available: true, location: "LS-03", isbn: "978-0838984857" },
 ];
 
 // Enhanced Digital Resources
@@ -83,17 +164,30 @@ const digitalResources = [
   { id: 15, title: "Library Brochure", description: "Download complete library information (PDF)", url: "https://www.periyaruniversity.ac.in/Documents/2021/Library.pdf", type: "Document", icon: Download },
 ];
 
-// Book Collections by Subject
-const bookCollections = [
-  { subject: "Computer Science & IT", books: 12500, journals: 45, eBooks: 8000 },
-  { subject: "Data Science & AI", books: 3500, journals: 25, eBooks: 5000 },
-  { subject: "Mathematics & Statistics", books: 8500, journals: 32, eBooks: 4500 },
-  { subject: "Physical Sciences", books: 15000, journals: 28, eBooks: 6000 },
-  { subject: "Life Sciences", books: 12000, journals: 35, eBooks: 5500 },
-  { subject: "Commerce & Management", books: 10000, journals: 22, eBooks: 4000 },
-  { subject: "Social Sciences", books: 18000, journals: 18, eBooks: 3500 },
-  { subject: "Languages & Literature", books: 15000, journals: 12, eBooks: 2000 },
-  { subject: "General & Reference", books: 4000, journals: 8, eBooks: 1500 },
+// Department-wise Book Collections
+const departmentCollections = [
+  { department: "Computer Science", icon: Calculator, books: 12500, journals: 45, eBooks: 8000, theses: 450, location: "Block D, Floor 2" },
+  { department: "Data Science & AI", icon: Brain, books: 3500, journals: 25, eBooks: 5000, theses: 120, location: "Block D, Floor 2" },
+  { department: "Mathematics & Statistics", icon: Calculator, books: 8500, journals: 32, eBooks: 4500, theses: 380, location: "Block A, Floor 1" },
+  { department: "Physics", icon: Atom, books: 7500, journals: 28, eBooks: 3500, theses: 320, location: "Block A, Floor 1" },
+  { department: "Chemistry", icon: FlaskConical, books: 6800, journals: 30, eBooks: 3200, theses: 290, location: "Block C, Floor 1" },
+  { department: "Biology & Biotechnology", icon: Leaf, books: 8200, journals: 35, eBooks: 4000, theses: 340, location: "Block C, Floor 2" },
+  { department: "Biochemistry", icon: FlaskConical, books: 4500, journals: 22, eBooks: 2500, theses: 180, location: "Block C, Floor 1" },
+  { department: "Microbiology", icon: FlaskConical, books: 3800, journals: 18, eBooks: 2200, theses: 150, location: "Block C, Floor 2" },
+  { department: "Environmental Science", icon: Leaf, books: 3200, journals: 15, eBooks: 1800, theses: 120, location: "Block G, Floor 1" },
+  { department: "Geology", icon: Globe, books: 2800, journals: 12, eBooks: 1500, theses: 90, location: "Block A, Floor 2" },
+  { department: "Commerce & Management", icon: Briefcase, books: 10000, journals: 22, eBooks: 4000, theses: 420, location: "Block B, Floor 1" },
+  { department: "Economics", icon: Briefcase, books: 5500, journals: 18, eBooks: 2500, theses: 210, location: "Block B, Floor 1" },
+  { department: "English", icon: Languages, books: 8500, journals: 15, eBooks: 2000, theses: 280, location: "Block F, Floor 1" },
+  { department: "Tamil", icon: Languages, books: 12000, journals: 12, eBooks: 1500, theses: 350, location: "Block F, Floor 2" },
+  { department: "History", icon: BookOpen, books: 6500, journals: 10, eBooks: 1200, theses: 180, location: "Block E, Floor 1" },
+  { department: "Psychology", icon: Brain, books: 4200, journals: 15, eBooks: 1800, theses: 140, location: "Block E, Floor 2" },
+  { department: "Sociology", icon: Users, books: 3800, journals: 12, eBooks: 1500, theses: 120, location: "Block E, Floor 1" },
+  { department: "Journalism", icon: Newspaper, books: 2500, journals: 20, eBooks: 1200, theses: 80, location: "Block E, Floor 2" },
+  { department: "Education", icon: GraduationCap, books: 5500, journals: 18, eBooks: 2200, theses: 220, location: "Block F, Floor 1" },
+  { department: "Food Science & Nutrition", icon: Leaf, books: 2800, journals: 14, eBooks: 1400, theses: 90, location: "Block C, Floor 2" },
+  { department: "Library Science", icon: Library, books: 3500, journals: 25, eBooks: 2000, theses: 110, location: "Central Library" },
+  { department: "General & Reference", icon: BookOpen, books: 4000, journals: 8, eBooks: 1500, theses: 0, location: "Ground Floor" },
 ];
 
 // Membership Types
@@ -101,15 +195,15 @@ const membershipTypes = [
   { 
     type: "Student Member", 
     eligibility: "All registered students of Periyar University",
-    borrowLimit: "UG: 3 books | PG: 5 books",
-    duration: "UG: 14 days | PG: 21 days",
+    borrowLimit: "PG: 5 books | Research: 8 books",
+    duration: "PG: 21 days | Research: 30 days",
     renewals: "2 times",
     fee: "Free (included in tuition)",
     features: ["Access to reading hall", "E-resource access", "Reference section", "Photocopying services"]
   },
   { 
     type: "Research Scholar", 
-    eligibility: "M.Phil. and Ph.D. scholars",
+    eligibility: "Ph.D. scholars",
     borrowLimit: "8 books",
     duration: "30 days",
     renewals: "3 times",
@@ -148,10 +242,36 @@ const libraryServices = [
   { name: "E-Resource Training", icon: GraduationCap, description: "Orientation programs for digital resources" },
 ];
 
-// Import Flask icon
-import { FlaskConical } from "lucide-react";
-
-const categories = ["All", "Computer Science", "Data Science", "Mathematics", "Physics", "Chemistry", "Biology", "Biochemistry", "Economics", "Commerce", "Management", "Political Science", "Psychology", "Tamil", "Environmental Science"];
+const categories = [
+  "All", 
+  "Computer Science", 
+  "Data Science", 
+  "Mathematics", 
+  "Physics", 
+  "Chemistry", 
+  "Biology", 
+  "Biochemistry", 
+  "Biotechnology",
+  "Microbiology",
+  "Botany",
+  "Zoology",
+  "Economics", 
+  "Commerce", 
+  "Management", 
+  "Political Science", 
+  "Psychology", 
+  "Sociology",
+  "History",
+  "Journalism",
+  "Tamil", 
+  "English",
+  "Environmental Science",
+  "Energy Science",
+  "Geology",
+  "Food Science",
+  "Nutrition",
+  "Library Science"
+];
 
 export const LibraryCatalog = () => {
   const [activeTab, setActiveTab] = useState<"physical" | "digital" | "collections" | "membership">("digital");
@@ -249,7 +369,7 @@ export const LibraryCatalog = () => {
           )}
         >
           <Library className="w-5 h-5" />
-          Collections
+          Department Collections
         </button>
         <button
           onClick={() => setActiveTab("membership")}
@@ -300,44 +420,50 @@ export const LibraryCatalog = () => {
 
       {/* Content */}
       {activeTab === "physical" && (
-        <div className="grid gap-4">
-          {filteredBooks.length === 0 ? (
-            <div className="text-center py-12 glass-dark rounded-2xl">
-              <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400">No books found matching your search</p>
-            </div>
-          ) : (
-            filteredBooks.map((book, index) => (
-              <div
-                key={book.id}
-                className="glass-dark rounded-xl p-4 flex items-center gap-4 hover:border-orange-500/30 transition-all animate-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-                  <Book className="w-6 h-6 text-orange-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-slate-100 truncate">{book.title}</h3>
-                  <p className="text-sm text-slate-400">{book.author}</p>
-                  <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                      {book.category}
-                    </span>
-                    <span className="text-xs text-slate-500">{book.location}</span>
-                    <span className="text-xs text-slate-600">ISBN: {book.isbn}</span>
+        <div className="space-y-4">
+          <div className="glass-dark rounded-xl p-4 mb-4">
+            <p className="text-sm text-slate-400">
+              Showing {filteredBooks.length} books {selectedCategory !== "All" && `in ${selectedCategory}`}
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {filteredBooks.length === 0 ? (
+              <div className="text-center py-12 glass-dark rounded-2xl">
+                <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400">No books found matching your search</p>
+              </div>
+            ) : (
+              filteredBooks.map((book, index) => (
+                <div
+                  key={book.id}
+                  className="glass-dark rounded-xl p-4 flex items-center gap-4 hover:border-orange-500/30 transition-all animate-in"
+                  style={{ animationDelay: `${index * 0.02}s` }}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                    <Book className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-slate-100 text-sm truncate">{book.title}</h3>
+                    <p className="text-xs text-slate-400">{book.author}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                        {book.category}
+                      </span>
+                      <span className="text-xs text-slate-500">{book.location}</span>
+                    </div>
+                  </div>
+                  <div className={cn(
+                    "px-2 py-1 rounded-full text-xs font-medium flex-shrink-0",
+                    book.available
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-red-500/20 text-red-400"
+                  )}>
+                    {book.available ? "Available" : "Borrowed"}
                   </div>
                 </div>
-                <div className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium",
-                  book.available
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-red-500/20 text-red-400"
-                )}>
-                  {book.available ? "Available" : "Borrowed"}
-                </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       )}
 
@@ -386,36 +512,51 @@ export const LibraryCatalog = () => {
 
       {activeTab === "collections" && (
         <div className="space-y-6">
-          {/* Subject-wise Collections */}
+          {/* Department-wise Collections */}
           <div className="glass-dark rounded-2xl p-6">
             <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
               <Library className="w-5 h-5 text-purple-400" />
-              Subject-wise Book Collections
+              Department-wise Book Collections
             </h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              {bookCollections.map((collection, index) => (
-                <div 
-                  key={collection.subject}
-                  className="bg-slate-800/50 rounded-xl p-4 animate-in"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <h4 className="font-medium text-slate-200 mb-3">{collection.subject}</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Books</span>
-                      <span className="text-orange-400 font-medium">{collection.books.toLocaleString()}</span>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {departmentCollections.map((collection, index) => {
+                const DeptIcon = collection.icon;
+                return (
+                  <div 
+                    key={collection.department}
+                    className="bg-slate-800/50 rounded-xl p-4 animate-in hover:bg-slate-800/70 transition-all"
+                    style={{ animationDelay: `${index * 0.03}s` }}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <DeptIcon className="w-5 h-5 text-purple-400" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-slate-200 text-sm">{collection.department}</h4>
+                        <p className="text-xs text-slate-500">{collection.location}</p>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Journals</span>
-                      <span className="text-blue-400 font-medium">{collection.journals}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">E-Books</span>
-                      <span className="text-green-400 font-medium">{collection.eBooks.toLocaleString()}</span>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Books</span>
+                        <span className="text-orange-400 font-medium">{collection.books.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Journals</span>
+                        <span className="text-blue-400 font-medium">{collection.journals}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">E-Books</span>
+                        <span className="text-green-400 font-medium">{collection.eBooks.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Theses</span>
+                        <span className="text-pink-400 font-medium">{collection.theses}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -454,7 +595,7 @@ export const LibraryCatalog = () => {
             <div className="grid md:grid-cols-2 gap-4">
               {[
                 { name: "Reference Section", desc: "Encyclopedias, dictionaries, handbooks, and quick reference materials" },
-                { name: "Text Book Section", desc: "Course books for all UG, PG, and research programs" },
+                { name: "Text Book Section", desc: "Course books for all PG and research programs" },
                 { name: "Competitive Exam Books", desc: "UPSC, TNPSC, NET, SLET, GATE preparation materials" },
                 { name: "Theses & Dissertations", desc: "Complete collection of university research works" },
                 { name: "Back Volumes Section", desc: "Archives of journals and periodicals" },

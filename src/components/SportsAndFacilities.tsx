@@ -16,7 +16,6 @@ import {
   Target,
   Bed,
   Fan,
-  Tv,
   BookOpen,
   Bath,
   Coffee,
@@ -24,9 +23,9 @@ import {
   Star,
   Home,
   Heart,
-  Film,
   Check,
   Info,
+  Dumbbell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -91,10 +90,10 @@ const hostelInfo = {
     { name: "24/7 Security", icon: Shield, available: true },
     { name: "Mess/Dining Hall", icon: Utensils, available: true },
     { name: "Reading Room", icon: BookOpen, available: true },
-    { name: "TV Room", icon: Tv, available: true },
+    { name: "Gymnasium", icon: Dumbbell, available: true },
     { name: "Indoor Games", icon: Trophy, available: true },
     { name: "Ground for Activities", icon: Target, available: true },
-    { name: "Weekly Movie Night", icon: Film, available: true },
+    { name: "Wi-Fi Facility", icon: Wifi, available: true },
   ],
   foodMenu: {
     regular: ["Idli", "Dosa", "Rice with Sambar", "Chapathi with Dhal", "Variety Rice"],
@@ -427,13 +426,13 @@ export const SportsAndFacilities = () => {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="glass-dark rounded-2xl p-6">
               <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                <Film className="w-5 h-5 text-purple-400" />
+                <Dumbbell className="w-5 h-5 text-purple-400" />
                 Recreation
               </h3>
               <ul className="space-y-3 text-sm">
                 <li className="flex items-center gap-3 text-slate-300">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  Weekly movie nights on Saturdays
+                  Fully equipped gymnasium
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
@@ -445,11 +444,11 @@ export const SportsAndFacilities = () => {
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  TV room for entertainment
+                  Reading room for studies
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
                   <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                  Reading room for studies
+                  Common room for socializing
                 </li>
               </ul>
             </div>
