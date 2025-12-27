@@ -697,7 +697,7 @@ export const AcademicsHub = () => {
                                   </div>
                                 </div>
                               );
-                            ))}
+                            })}
                           </div>
                         </div>
 
