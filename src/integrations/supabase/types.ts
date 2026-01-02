@@ -14,7 +14,527 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      achievements: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          icon_name: string | null
+          id: string
+          title: string
+          year: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          title: string
+          year?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          title?: string
+          year?: string | null
+        }
+        Relationships: []
+      }
+      cdoe_programs: {
+        Row: {
+          created_at: string
+          degree_type: string | null
+          duration: string | null
+          eligibility: string | null
+          fee_per_year: string | null
+          id: string
+          name: string
+          total_fee: string | null
+        }
+        Insert: {
+          created_at?: string
+          degree_type?: string | null
+          duration?: string | null
+          eligibility?: string | null
+          fee_per_year?: string | null
+          id?: string
+          name: string
+          total_fee?: string | null
+        }
+        Update: {
+          created_at?: string
+          degree_type?: string | null
+          duration?: string | null
+          eligibility?: string | null
+          fee_per_year?: string | null
+          id?: string
+          name?: string
+          total_fee?: string | null
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          created_at: string
+          degree_type: string
+          department_id: string | null
+          duration: string | null
+          eligibility: string | null
+          first_year_fee: string | null
+          fourth_sem_fee: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          per_year_fee: string | null
+          second_year_fee: string | null
+          third_sem_fee: string | null
+          total_fee: string | null
+        }
+        Insert: {
+          created_at?: string
+          degree_type: string
+          department_id?: string | null
+          duration?: string | null
+          eligibility?: string | null
+          first_year_fee?: string | null
+          fourth_sem_fee?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          per_year_fee?: string | null
+          second_year_fee?: string | null
+          third_sem_fee?: string | null
+          total_fee?: string | null
+        }
+        Update: {
+          created_at?: string
+          degree_type?: string
+          department_id?: string | null
+          duration?: string | null
+          eligibility?: string | null
+          first_year_fee?: string | null
+          fourth_sem_fee?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          per_year_fee?: string | null
+          second_year_fee?: string | null
+          third_sem_fee?: string | null
+          total_fee?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      departments: {
+        Row: {
+          color: string | null
+          created_at: string
+          email: string | null
+          highlights: string[] | null
+          icon_name: string | null
+          id: string
+          location: string | null
+          name: string
+          phone: string | null
+          placements: string | null
+          rating: number | null
+          reviews: number | null
+          school: string | null
+          url: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          email?: string | null
+          highlights?: string[] | null
+          icon_name?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          phone?: string | null
+          placements?: string | null
+          rating?: number | null
+          reviews?: number | null
+          school?: string | null
+          url?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          email?: string | null
+          highlights?: string[] | null
+          icon_name?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          phone?: string | null
+          placements?: string | null
+          rating?: number | null
+          reviews?: number | null
+          school?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
+      digital_resources: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon_name: string | null
+          id: string
+          resource_type: string
+          title: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          resource_type: string
+          title: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          resource_type?: string
+          title?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
+      facilities: {
+        Row: {
+          capacity: string | null
+          category: string
+          created_at: string
+          description: string | null
+          features: string[] | null
+          icon_name: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          capacity?: string | null
+          category: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          icon_name?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          capacity?: string | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          icon_name?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      hostel_info: {
+        Row: {
+          amenities: Json | null
+          created_at: string
+          food_menu: Json | null
+          google_maps_url: string | null
+          id: string
+          location: string | null
+          mess_charges: string | null
+          monthly_rent: string | null
+          rating: number | null
+          room_capacity: string | null
+          rules: string[] | null
+          total_capacity: string | null
+          total_reviews: number | null
+        }
+        Insert: {
+          amenities?: Json | null
+          created_at?: string
+          food_menu?: Json | null
+          google_maps_url?: string | null
+          id?: string
+          location?: string | null
+          mess_charges?: string | null
+          monthly_rent?: string | null
+          rating?: number | null
+          room_capacity?: string | null
+          rules?: string[] | null
+          total_capacity?: string | null
+          total_reviews?: number | null
+        }
+        Update: {
+          amenities?: Json | null
+          created_at?: string
+          food_menu?: Json | null
+          google_maps_url?: string | null
+          id?: string
+          location?: string | null
+          mess_charges?: string | null
+          monthly_rent?: string | null
+          rating?: number | null
+          room_capacity?: string | null
+          rules?: string[] | null
+          total_capacity?: string | null
+          total_reviews?: number | null
+        }
+        Relationships: []
+      }
+      library_books: {
+        Row: {
+          author: string
+          available: boolean | null
+          category: string
+          created_at: string
+          department: string | null
+          id: string
+          isbn: string | null
+          location: string | null
+          title: string
+        }
+        Insert: {
+          author: string
+          available?: boolean | null
+          category: string
+          created_at?: string
+          department?: string | null
+          id?: string
+          isbn?: string | null
+          location?: string | null
+          title: string
+        }
+        Update: {
+          author?: string
+          available?: boolean | null
+          category?: string
+          created_at?: string
+          department?: string | null
+          id?: string
+          isbn?: string | null
+          location?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      library_collections: {
+        Row: {
+          created_at: string
+          department: string
+          e_books: number | null
+          icon_name: string | null
+          id: string
+          journals: number | null
+          location: string | null
+          theses: number | null
+          total_books: number | null
+        }
+        Insert: {
+          created_at?: string
+          department: string
+          e_books?: number | null
+          icon_name?: string | null
+          id?: string
+          journals?: number | null
+          location?: string | null
+          theses?: number | null
+          total_books?: number | null
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          e_books?: number | null
+          icon_name?: string | null
+          id?: string
+          journals?: number | null
+          location?: string | null
+          theses?: number | null
+          total_books?: number | null
+        }
+        Relationships: []
+      }
+      news_feed: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          news_date: string | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          news_date?: string | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          news_date?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      placement_stats: {
+        Row: {
+          academic_year: string
+          average_package: string | null
+          companies: number | null
+          created_at: string
+          highest_package: string | null
+          id: string
+          students_placed: number | null
+        }
+        Insert: {
+          academic_year: string
+          average_package?: string | null
+          companies?: number | null
+          created_at?: string
+          highest_package?: string | null
+          id?: string
+          students_placed?: number | null
+        }
+        Update: {
+          academic_year?: string
+          average_package?: string | null
+          companies?: number | null
+          created_at?: string
+          highest_package?: string | null
+          id?: string
+          students_placed?: number | null
+        }
+        Relationships: []
+      }
+      sports_events: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          status: string | null
+          title: string
+          venue: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          venue?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      student_clubs: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon_name: string | null
+          id: string
+          members: string | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          members?: string | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          members?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      top_recruiters: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          sector: string | null
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          sector?: string | null
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          sector?: string | null
+        }
+        Relationships: []
+      }
+      university_info: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          key: string
+          value: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          key: string
+          value?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          key?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
