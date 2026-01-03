@@ -7,10 +7,8 @@ import {
   Droplets,
   Utensils,
   Shield,
-  Coins,
   X,
   MapPin,
-  Clock,
   Users,
   Medal,
   Target,
@@ -26,110 +24,66 @@ import {
   Check,
   Info,
   Dumbbell,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  useSportsEvents,
+  useAchievements,
+  useFacilities,
+  useHostelInfo,
+} from "@/hooks/useUniversityData";
 
-// Sports Events Data
-const sportsEvents = [
-  {
-    id: 1,
-    title: "Inter-University Athletics Meet",
-    date: "2025-02-15",
-    venue: "University Stadium",
-    description: "Annual athletics competition featuring track and field events with participants from 50+ universities.",
-    category: "Athletics",
-    status: "upcoming",
-  },
-  {
-    id: 2,
-    title: "Basketball Championship",
-    date: "2025-01-25",
-    venue: "Indoor Sports Complex",
-    description: "Inter-department basketball tournament with knockout format.",
-    category: "Basketball",
-    status: "upcoming",
-  },
-  {
-    id: 3,
-    title: "Cricket Tournament",
-    date: "2025-03-10",
-    venue: "University Cricket Ground",
-    description: "Annual T20 cricket tournament for all departments.",
-    category: "Cricket",
-    status: "upcoming",
-  },
-  {
-    id: 4,
-    title: "Volleyball League",
-    date: "2025-02-01",
-    venue: "Outdoor Courts",
-    description: "Men's and women's volleyball league matches.",
-    category: "Volleyball",
-    status: "upcoming",
-  },
-];
-
-// Enhanced Hostel Data based on CollegeDunia
-const hostelInfo = {
-  monthlyRent: "₹700",
-  messCharges: "Included in rent",
-  roomCapacity: "5 students per room",
-  totalCapacity: "2,000+ students",
-  rating: 3.7,
-  totalReviews: 385,
-  location: "End of University Campus",
-  googleMapsUrl: "https://www.google.com/maps/search/Periyar+University+Hostel+Salem+Tamil+Nadu",
-  maleHostel: true,
-  femaleHostel: true,
-  amenities: [
-    { name: "Hot Water Supply", icon: Droplets, available: true },
-    { name: "Double Fans per Room", icon: Fan, available: true },
-    { name: "Individual Carts", icon: Bed, available: true },
-    { name: "Separate Storage Space", icon: Home, available: true },
-    { name: "Clean Bathrooms", icon: Bath, available: true },
-    { name: "24/7 Security", icon: Shield, available: true },
-    { name: "Mess/Dining Hall", icon: Utensils, available: true },
-    { name: "Reading Room", icon: BookOpen, available: true },
-    { name: "Gymnasium", icon: Dumbbell, available: true },
-    { name: "Indoor Games", icon: Trophy, available: true },
-    { name: "Ground for Activities", icon: Target, available: true },
-    { name: "Wi-Fi Facility", icon: Wifi, available: true },
-  ],
-  foodMenu: {
-    regular: ["Idli", "Dosa", "Rice with Sambar", "Chapathi with Dhal", "Variety Rice"],
-    special: ["Upma", "Biriyani (Sundays & Festivals)"],
-    description: "Menu decided by students with traditional South Indian meals"
-  },
-  ratings: {
-    academic: 4.1,
-    faculty: 4.0,
-    infrastructure: 4.0,
-    accommodation: 3.7,
-    placement: 3.8,
-  }
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  Trophy,
+  Medal,
+  Target,
+  Droplets,
+  Dumbbell,
+  BookOpen,
+  Wifi,
+  Shield,
+  Utensils,
+  Bed,
+  Fan,
+  Bath,
+  Coffee,
+  Home,
+  Heart,
+  Award: Medal,
 };
-
-// Achievements
-const achievements = [
-  { title: "South Zone Champion - Athletics", year: "2024", icon: Medal },
-  { title: "State University Games - Gold", year: "2024", icon: Trophy },
-  { title: "Inter-University Kabaddi - Runner Up", year: "2023", icon: Target },
-  { title: "All India University Volleyball", year: "2023", icon: Medal },
-];
-
-// Hostel Rules
-const hostelRules = [
-  "In-time: 10:00 PM (Strict)",
-  "Attendance mandatory at meals",
-  "Visitors allowed only in common area",
-  "No cooking inside rooms",
-  "Maintain cleanliness and discipline",
-  "Ragging is strictly prohibited",
-];
 
 export const SportsAndFacilities = () => {
   const [activeTab, setActiveTab] = useState<"sports" | "hostel">("sports");
-  const [selectedEvent, setSelectedEvent] = useState<typeof sportsEvents[0] | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+
+  // Fetch data from database
+  const { data: sportsEvents, isLoading: loadingEvents } = useSportsEvents();
+  const { data: achievements, isLoading: loadingAchievements } = useAchievements();
+  const { data: facilities, isLoading: loadingFacilities } = useFacilities();
+  const { data: hostelInfo, isLoading: loadingHostel } = useHostelInfo();
+
+  const isLoading = loadingEvents || loadingAchievements || loadingFacilities || loadingHostel;
+
+  const sportsFacilities = facilities?.filter(f => f.category === "sports") || [];
+
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-8 max-w-6xl mx-auto flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+          <p className="text-slate-400">Loading facilities information...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Parse hostel amenities from JSONB with proper typing
+  const hostelAmenities = (Array.isArray(hostelInfo?.amenities) ? hostelInfo.amenities : []) as Array<{ name: string; available: boolean }>;
+  const foodMenu = (hostelInfo?.food_menu && typeof hostelInfo.food_menu === 'object' && !Array.isArray(hostelInfo.food_menu) 
+    ? hostelInfo.food_menu 
+    : { regular: [], special: [], description: "" }) as { regular: string[]; special: string[]; description: string };
+  const hostelRules = (Array.isArray(hostelInfo?.rules) ? hostelInfo.rules : []) as string[];
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
@@ -167,7 +121,7 @@ export const SportsAndFacilities = () => {
         </button>
       </div>
 
-      {/* Content */}
+      {/* Sports Content */}
       {activeTab === "sports" && (
         <div className="space-y-6">
           {/* Achievements Wall */}
@@ -177,20 +131,24 @@ export const SportsAndFacilities = () => {
               Recent Achievements
             </h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {achievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                    <achievement.icon className="w-5 h-5 text-yellow-400" />
+              {achievements?.map((achievement, index) => {
+                const IconComponent = iconMap[achievement.icon_name || "Medal"] || Medal;
+                return (
+                  <div
+                    key={achievement.id}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 animate-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                      <IconComponent className="w-5 h-5 text-yellow-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-200">{achievement.title}</p>
+                      <p className="text-xs text-slate-500">{achievement.year}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-200">{achievement.title}</p>
-                    <p className="text-xs text-slate-500">{achievement.year}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -201,7 +159,7 @@ export const SportsAndFacilities = () => {
               Upcoming Events
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
-              {sportsEvents.map((event, index) => (
+              {sportsEvents?.map((event, index) => (
                 <div
                   key={event.id}
                   onClick={() => setSelectedEvent(event)}
@@ -213,7 +171,7 @@ export const SportsAndFacilities = () => {
                       {event.category}
                     </span>
                     <span className="text-xs text-slate-500">
-                      {new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                      {event.event_date ? new Date(event.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "TBA"}
                     </span>
                   </div>
                   <h4 className="font-semibold text-slate-100 group-hover:text-orange-400 transition-colors mb-2">
@@ -235,22 +193,17 @@ export const SportsAndFacilities = () => {
               Sports Facilities
             </h3>
             <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { name: "University Stadium", capacity: "5,000 seats", sports: "Athletics, Football" },
-                { name: "Indoor Sports Complex", capacity: "1,500 seats", sports: "Basketball, Badminton, Table Tennis" },
-                { name: "Cricket Ground", capacity: "2,000 seats", sports: "Cricket, Practice Nets" },
-                { name: "Swimming Pool", capacity: "Olympic size", sports: "Swimming, Water Polo" },
-                { name: "Gymnasium", capacity: "Modern Equipment", sports: "Weight Training, Fitness" },
-                { name: "Tennis Courts", capacity: "4 Courts", sports: "Tennis, Practice" },
-              ].map((facility, index) => (
+              {sportsFacilities.map((facility, index) => (
                 <div 
-                  key={facility.name}
+                  key={facility.id}
                   className="bg-slate-800/50 rounded-xl p-4 animate-in"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <h4 className="font-medium text-slate-200 mb-2">{facility.name}</h4>
                   <p className="text-sm text-slate-400">{facility.capacity}</p>
-                  <p className="text-xs text-orange-400 mt-1">{facility.sports}</p>
+                  {facility.features && (
+                    <p className="text-xs text-orange-400 mt-1">{facility.features.join(", ")}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -258,7 +211,8 @@ export const SportsAndFacilities = () => {
         </div>
       )}
 
-      {activeTab === "hostel" && (
+      {/* Hostel Content */}
+      {activeTab === "hostel" && hostelInfo && (
         <div className="space-y-6">
           {/* Rating & Overview Card */}
           <div className="glass-dark rounded-2xl p-6 border-blue-500/20">
@@ -271,44 +225,46 @@ export const SportsAndFacilities = () => {
                     {hostelInfo.rating}/5
                   </span>
                 </div>
-                <p className="text-sm text-slate-400">Based on {hostelInfo.totalReviews} verified student reviews</p>
+                <p className="text-sm text-slate-400">Based on {hostelInfo.total_reviews} verified student reviews</p>
               </div>
               <div className="flex gap-3">
                 <div className="text-center px-4 py-2 rounded-xl bg-blue-500/20">
-                  <p className="text-2xl font-bold text-blue-400">{hostelInfo.monthlyRent}</p>
+                  <p className="text-2xl font-bold text-blue-400">{hostelInfo.monthly_rent}</p>
                   <p className="text-xs text-slate-400">Monthly Rent</p>
                 </div>
                 <div className="text-center px-4 py-2 rounded-xl bg-green-500/20">
-                  <p className="text-sm font-medium text-green-400">Mess Included</p>
-                  <p className="text-xs text-slate-400">In Rent</p>
+                  <p className="text-sm font-medium text-green-400">{hostelInfo.mess_charges}</p>
+                  <p className="text-xs text-slate-400">Mess</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Location with Google Maps Link */}
-          <a 
-            href={hostelInfo.googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass-dark rounded-2xl p-5 flex items-center justify-between hover:border-orange-500/30 transition-all group block"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-orange-400" />
+          {hostelInfo.google_maps_url && (
+            <a 
+              href={hostelInfo.google_maps_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="glass-dark rounded-2xl p-5 flex items-center justify-between hover:border-orange-500/30 transition-all group block"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-orange-400" />
+                </div>
+                <div>
+                  <h4 className="font-medium text-slate-200 group-hover:text-orange-400 transition-colors">
+                    Hostel Location
+                  </h4>
+                  <p className="text-sm text-slate-400">{hostelInfo.location}, Periyar University Campus, Salem</p>
+                </div>
               </div>
-              <div>
-                <h4 className="font-medium text-slate-200 group-hover:text-orange-400 transition-colors">
-                  Hostel Location
-                </h4>
-                <p className="text-sm text-slate-400">{hostelInfo.location}, Periyar University Campus, Salem</p>
+              <div className="flex items-center gap-2 text-blue-400 group-hover:text-blue-300">
+                <span className="text-sm hidden md:inline">Open in Google Maps</span>
+                <ExternalLink className="w-5 h-5" />
               </div>
-            </div>
-            <div className="flex items-center gap-2 text-blue-400 group-hover:text-blue-300">
-              <span className="text-sm hidden md:inline">Open in Google Maps</span>
-              <ExternalLink className="w-5 h-5" />
-            </div>
-          </a>
+            </a>
+          )}
 
           {/* Hostel Types */}
           <div className="grid md:grid-cols-2 gap-4">
@@ -325,7 +281,7 @@ export const SportsAndFacilities = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Room Type</span>
-                  <span className="text-slate-200">{hostelInfo.roomCapacity}</span>
+                  <span className="text-slate-200">{hostelInfo.room_capacity}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Security</span>
@@ -347,7 +303,7 @@ export const SportsAndFacilities = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Room Type</span>
-                  <span className="text-slate-200">{hostelInfo.roomCapacity}</span>
+                  <span className="text-slate-200">{hostelInfo.room_capacity}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Special Security</span>
@@ -364,7 +320,7 @@ export const SportsAndFacilities = () => {
               Room Amenities & Facilities
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {hostelInfo.amenities.map((amenity, index) => (
+              {hostelAmenities.map((amenity: any, index: number) => (
                 <div
                   key={amenity.name}
                   className="glass-dark rounded-xl p-4 flex items-center gap-3 animate-in"
@@ -374,7 +330,7 @@ export const SportsAndFacilities = () => {
                     "w-10 h-10 rounded-lg flex items-center justify-center",
                     amenity.available ? "bg-green-500/20" : "bg-slate-800"
                   )}>
-                    <amenity.icon className={cn(
+                    <Check className={cn(
                       "w-5 h-5",
                       amenity.available ? "text-green-400" : "text-slate-500"
                     )} />
@@ -391,7 +347,7 @@ export const SportsAndFacilities = () => {
               <Utensils className="w-5 h-5 text-orange-400" />
               Mess & Food
             </h3>
-            <p className="text-sm text-slate-400 mb-4">{hostelInfo.foodMenu.description}</p>
+            <p className="text-sm text-slate-400 mb-4">{foodMenu.description}</p>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-slate-800/50 rounded-xl p-4">
                 <h4 className="font-medium text-slate-200 mb-3 flex items-center gap-2">
@@ -399,7 +355,7 @@ export const SportsAndFacilities = () => {
                   Regular Menu
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {hostelInfo.foodMenu.regular.map((item) => (
+                  {foodMenu.regular?.map((item: string) => (
                     <span key={item} className="text-xs px-3 py-1 rounded-full bg-slate-700 text-slate-300">
                       {item}
                     </span>
@@ -412,7 +368,7 @@ export const SportsAndFacilities = () => {
                   Special Days (Sundays & Festivals)
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {hostelInfo.foodMenu.special.map((item) => (
+                  {foodMenu.special?.map((item: string) => (
                     <span key={item} className="text-xs px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400">
                       {item}
                     </span>
@@ -459,7 +415,7 @@ export const SportsAndFacilities = () => {
                 Hostel Rules
               </h3>
               <ul className="space-y-3 text-sm">
-                {hostelRules.map((rule, index) => (
+                {hostelRules.map((rule: string, index: number) => (
                   <li key={index} className="flex items-center gap-3 text-slate-300">
                     <span className="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs flex-shrink-0">
                       {index + 1}
@@ -469,26 +425,6 @@ export const SportsAndFacilities = () => {
                 ))}
               </ul>
             </div>
-          </div>
-
-          {/* Student Review Summary */}
-          <div className="glass-dark rounded-2xl p-6">
-            <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-400" />
-              Student Reviews Summary
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-              {Object.entries(hostelInfo.ratings).map(([key, value]) => (
-                <div key={key} className="text-center">
-                  <div className="text-2xl font-bold text-orange-400">{value}</div>
-                  <p className="text-xs text-slate-400 capitalize">{key}</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-slate-400 italic">
-              "The hostel is a supportive second home for students with good facilities and safety measures, 
-              especially for female students. Registration process is straightforward with college assistance."
-            </p>
           </div>
 
           {/* Admission Process */}
@@ -541,9 +477,9 @@ export const SportsAndFacilities = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-3 text-slate-300">
                 <Calendar className="w-5 h-5 text-orange-400" />
-                {new Date(selectedEvent.date).toLocaleDateString("en-IN", { 
+                {selectedEvent.event_date ? new Date(selectedEvent.event_date).toLocaleDateString("en-IN", { 
                   weekday: "long", day: "numeric", month: "long", year: "numeric" 
-                })}
+                }) : "Date TBA"}
               </div>
               <div className="flex items-center gap-3 text-slate-300">
                 <MapPin className="w-5 h-5 text-orange-400" />
