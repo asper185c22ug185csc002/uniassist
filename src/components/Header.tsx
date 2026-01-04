@@ -1,6 +1,7 @@
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import periyarLogo from "@/assets/periyar-logo.jpg";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,11 +12,15 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <GraduationCap className="w-6 h-6 text-primary-foreground" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden group-hover:scale-105 transition-transform duration-300 border-2 border-primary/30">
+              <img 
+                src={periyarLogo} 
+                alt="Periyar University Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="font-bold text-xl text-foreground">
-              Uni<span className="text-secondary">Assist</span>
+              Periyar<span className="text-secondary"> University</span>
             </span>
           </a>
 
