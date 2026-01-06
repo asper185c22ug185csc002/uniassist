@@ -1,10 +1,11 @@
-import { Menu, X } from "lucide-react";
+import { Menu, X, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import periyarLogo from "@/assets/periyar-logo.jpg";
-
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin } = useAuth();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -37,8 +38,21 @@ export const Header = () => {
             </a>
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:block">
+          {/* CTA Buttons */}
+          <div className="hidden md:flex items-center gap-2">
+            {isAdmin && (
+              <Button variant="outline" size="sm" asChild>
+                <a href="/admin">
+                  <Shield className="w-4 h-4 mr-1" />
+                  Admin
+                </a>
+              </Button>
+            )}
+            {!user && (
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/auth">Login</a>
+              </Button>
+            )}
             <Button variant="default" size="sm" asChild>
               <a href="#chat">Start Chatting</a>
             </Button>
@@ -80,6 +94,25 @@ export const Header = () => {
               >
                 About
               </a>
+              {isAdmin && (
+                <a 
+                  href="/admin" 
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin Panel
+                </a>
+              )}
+              {!user && (
+                <a 
+                  href="/auth" 
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Login
+                </a>
+              )}
               <Button variant="default" size="sm" className="w-fit" asChild>
                 <a href="#chat" onClick={() => setIsMenuOpen(false)}>Start Chatting</a>
               </Button>
