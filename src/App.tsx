@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
+import FloatingAIButton from "./components/FloatingAIButton";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <FloatingAIButton />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -1,4 +1,6 @@
-import { GraduationCap, Heart } from "lucide-react";
+import { GraduationCap, Heart, MapPin, ExternalLink } from "lucide-react";
+
+const GOOGLE_MAPS_URL = "https://www.google.com/maps/place/Periyar+University/@11.7168999,78.0808945,17z";
 
 export const Footer = () => {
   return (
@@ -11,20 +13,32 @@ export const Footer = () => {
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl text-primary-foreground">
-              Uni<span className="text-secondary">Assist</span>
+              Periyar<span className="text-secondary">University</span>
             </span>
           </div>
 
+          {/* Location Link */}
+          <a 
+            href={GOOGLE_MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors group"
+          >
+            <MapPin className="w-5 h-5 text-secondary" />
+            <span className="text-sm">Salem, Tamil Nadu, India</span>
+            <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </a>
+
           {/* Links */}
           <nav className="flex flex-wrap justify-center gap-6">
-            <a href="#features" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-              Features
+            <a href="/" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              AI Assistant
             </a>
-            <a href="#chat" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-              Chat
+            <a href="/academics" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              Academics
             </a>
-            <a href="#about" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-              About
+            <a href="/contact" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              Contact
             </a>
           </nav>
 
@@ -38,7 +52,7 @@ export const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-primary-foreground/10 text-center">
           <p className="text-xs text-primary-foreground/50">
-            © {new Date().getFullYear()} UniAssist AI. All rights reserved. Providing 24/7 campus support.
+            © {new Date().getFullYear()} Periyar University. All rights reserved. Providing 24/7 campus support.
           </p>
         </div>
       </div>
