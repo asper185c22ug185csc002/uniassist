@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2 } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 
-type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info';
+type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -72,6 +72,9 @@ const Admin = () => {
       news_feed: ['title', 'description', 'category', 'news_date'],
       library_books: ['title', 'author', 'category', 'isbn', 'location'],
       university_info: ['key', 'value', 'category'],
+      achievements: ['title', 'description', 'category', 'year', 'icon_name'],
+      student_clubs: ['name', 'description', 'members', 'icon_name'],
+      hostel_info: ['location', 'room_capacity', 'total_capacity', 'monthly_rent', 'mess_charges'],
     };
     return columns[table] || [];
   };
@@ -201,6 +204,9 @@ const Admin = () => {
                 <TabsTrigger value="courses">Courses</TabsTrigger>
                 <TabsTrigger value="library_books">Library Books</TabsTrigger>
                 <TabsTrigger value="university_info">University Info</TabsTrigger>
+                <TabsTrigger value="achievements">Achievements</TabsTrigger>
+                <TabsTrigger value="student_clubs">Student Clubs</TabsTrigger>
+                <TabsTrigger value="hostel_info">Hostel Info</TabsTrigger>
               </TabsList>
 
               <TabsContent value={activeTable}>
