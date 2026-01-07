@@ -303,7 +303,7 @@ export const AcademicsHub = () => {
 
                         {dept.courses && dept.courses.length > 0 && (
                           <div className="mt-3 space-y-2">
-                            <p className="text-xs text-slate-400 font-medium">Fee Structure (2025-26):</p>
+                            <p className="text-xs text-slate-400 font-medium">Fee Structure (2026-27):</p>
                             <div className="grid gap-2">
                               {dept.courses.map((course: any) => (
                                 <div key={course.id} className="bg-slate-800/30 rounded p-2">
@@ -361,7 +361,7 @@ export const AcademicsHub = () => {
           <div className="glass-dark rounded-2xl p-5">
             <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-orange-400" />
-              Regular Programs Fee Structure (2025-26)
+              Regular Programs Fee Structure (2026-27)
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
