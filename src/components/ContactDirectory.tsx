@@ -21,10 +21,13 @@ import {
   Sun,
   Brain,
   Loader2,
+  Navigation,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useDepartments } from "@/hooks/useUniversityData";
+
+const GOOGLE_MAPS_URL = "https://www.google.com/maps/place/Periyar+University/@11.7168999,78.0808945,17z";
 
 const getCategoryFromSchool = (school: string | null): string => {
   if (!school) return "Admin";
@@ -190,6 +193,44 @@ export const ContactDirectory = () => {
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-100 mb-2">Contact Directory</h1>
         <p className="text-slate-400">Find department contacts across 9 Schools and {departments.length} Departments</p>
+      </div>
+
+      {/* Location Map Card */}
+      <div className="glass-dark rounded-2xl p-5 mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-orange-400" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-100">Periyar University Campus</h3>
+              <p className="text-sm text-slate-400">Salem - 636 011, Tamil Nadu, India</p>
+            </div>
+          </div>
+          <a
+            href={GOOGLE_MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-400 hover:to-blue-500 transition-all"
+          >
+            <Navigation className="w-5 h-5" />
+            Open in Google Maps
+          </a>
+        </div>
+        
+        {/* Embedded Map */}
+        <div className="mt-4 rounded-xl overflow-hidden border border-slate-700/50">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.8694!2d78.0808945!3d11.7168999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babf1ccb1d5c4b9%3A0x11a3b2e89faeec0a!2sPeriyar%20University!5e0!3m2!1sen!2sin!4v1704067200000!5m2!1sen!2sin"
+            width="100%"
+            height="250"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="grayscale hover:grayscale-0 transition-all duration-500"
+          />
+        </div>
       </div>
 
       {/* Search and Filter */}
