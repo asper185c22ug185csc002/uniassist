@@ -22,6 +22,7 @@ import {
   Brain,
   Loader2,
   Navigation,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -197,39 +198,82 @@ export const ContactDirectory = () => {
 
       {/* Location Map Card */}
       <div className="glass-dark rounded-2xl p-5 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
-              <MapPin className="w-6 h-6 text-orange-400" />
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Location Details */}
+          <div className="flex-1 space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-slate-100 text-lg">Periyar University Campus</h3>
+                <p className="text-sm text-slate-400">State University established in 1997</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-slate-100">Periyar University Campus</h3>
-              <p className="text-sm text-slate-400">Salem - 636 011, Tamil Nadu, India</p>
+            
+            {/* Address Details */}
+            <div className="bg-slate-800/30 rounded-xl p-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-orange-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-slate-200">Address</p>
+                  <p className="text-sm text-slate-400">Periyar Palkalai Nagar, Salem - 636 011, Tamil Nadu, India</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 text-blue-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-slate-200">Phone</p>
+                  <p className="text-sm text-slate-400">+91-427-2345766, 2345520</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Mail className="w-4 h-4 text-green-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-slate-200">Email</p>
+                  <p className="text-sm text-slate-400">registrar@periyaruniversity.ac.in</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Globe className="w-4 h-4 text-purple-400 mt-1 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-slate-200">Website</p>
+                  <a 
+                    href="https://www.periyaruniversity.ac.in" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    www.periyaruniversity.ac.in
+                  </a>
+                </div>
+              </div>
             </div>
+            
+            <a
+              href={GOOGLE_MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-400 hover:to-blue-500 transition-all"
+            >
+              <Navigation className="w-5 h-5" />
+              Get Directions
+            </a>
           </div>
-          <a
-            href={GOOGLE_MAPS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-400 hover:to-blue-500 transition-all"
-          >
-            <Navigation className="w-5 h-5" />
-            Open in Google Maps
-          </a>
-        </div>
-        
-        {/* Embedded Map */}
-        <div className="mt-4 rounded-xl overflow-hidden border border-slate-700/50">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.8694!2d78.0808945!3d11.7168999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babf1ccb1d5c4b9%3A0x11a3b2e89faeec0a!2sPeriyar%20University!5e0!3m2!1sen!2sin!4v1704067200000!5m2!1sen!2sin"
-            width="100%"
-            height="250"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="grayscale hover:grayscale-0 transition-all duration-500"
-          />
+          
+          {/* Embedded Map */}
+          <div className="flex-1 min-h-[300px] rounded-xl overflow-hidden border border-slate-700/50">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.8694!2d78.0808945!3d11.7168999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3babf1ccb1d5c4b9%3A0x11a3b2e89faeec0a!2sPeriyar%20University!5e0!3m2!1sen!2sin!4v1704067200000!5m2!1sen!2sin"
+              width="100%"
+              height="100%"
+              style={{ border: 0, minHeight: '300px' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="grayscale hover:grayscale-0 transition-all duration-500"
+            />
+          </div>
         </div>
       </div>
 

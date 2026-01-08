@@ -127,8 +127,8 @@ const Auth = () => {
             </CardTitle>
             <CardDescription className="mt-2">
               {isLogin 
-                ? 'Sign in to access the admin panel' 
-                : 'Create an admin account to manage university data'}
+                ? 'Sign in to access your account or admin panel' 
+                : 'Create an account to save your preferences'}
             </CardDescription>
           </div>
         </CardHeader>
@@ -181,7 +181,25 @@ const Auth = () => {
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-4">
+          {/* Continue without login option */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border/50"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            onClick={() => navigate('/')}
+          >
+            Continue without signing in
+          </Button>
+          
+          <div className="mt-6 text-center">
             <button
               type="button"
               onClick={() => {
@@ -194,13 +212,6 @@ const Auth = () => {
                 ? "Don't have an account? Sign up" 
                 : 'Already have an account? Sign in'}
             </button>
-            
-            <div>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
