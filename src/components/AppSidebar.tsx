@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   HelpCircle,
   BookOpenCheck,
@@ -8,8 +8,13 @@ import {
   Phone,
   ChevronLeft,
   ChevronRight,
+  User,
+  LogOut,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import periyarLogo from "@/assets/periyar-logo.jpg";
 
 const menuItems = [
@@ -48,9 +53,21 @@ const menuItems = [
 export const AppSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
 
   const handleCallNow = () => {
     window.location.href = "tel:04272345766";
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast.error("Failed to sign out");
+    } else {
+      toast.success("Signed out successfully");
+      navigate("/");
+    }
   };
 
   return (
@@ -133,6 +150,106 @@ export const AppSidebar = () => {
             </NavLink>
           );
         })}
+
+        {/* Account Section */}
+        {!collapsed && (
+          <div className="pt-4">
+            <p className="px-3 text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Account</p>
+          </div>
+        )}
+        
+        {user ? (
+          <>
+            {isAdmin && (
+              <NavLink
+                to="/admin"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+                  "hover:bg-slate-800/60 group",
+                  location.pathname === "/admin"
+                    ? "bg-gradient-to-r from-orange-500/20 to-orange-600/10 border border-orange-500/30 text-orange-400"
+                    : "text-slate-400 hover:text-slate-200"
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                    location.pathname === "/admin"
+                      ? "bg-orange-500/20 text-orange-400"
+                      : "bg-slate-800/50 text-slate-400 group-hover:bg-slate-700/50 group-hover:text-slate-200"
+                  )}
+                >
+                  <Shield className="w-5 h-5" />
+                </div>
+                
+                {!collapsed && (
+                  <div className="flex-1 min-w-0 fade-in">
+                    <p className={cn(
+                      "font-medium text-sm truncate",
+                      location.pathname === "/admin" ? "text-orange-400" : "text-slate-200"
+                    )}>
+                      Admin Panel
+                    </p>
+                  </div>
+                )}
+              </NavLink>
+            )}
+            
+            <button
+              onClick={handleSignOut}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+                "hover:bg-red-500/10 group text-slate-400 hover:text-red-400"
+              )}
+            >
+              <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-slate-800/50 group-hover:bg-red-500/20 transition-all">
+                <LogOut className="w-5 h-5" />
+              </div>
+              
+              {!collapsed && (
+                <div className="flex-1 min-w-0 fade-in text-left">
+                  <p className="font-medium text-sm truncate text-slate-200 group-hover:text-red-400">
+                    Sign Out
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">{user.email}</p>
+                </div>
+              )}
+            </button>
+          </>
+        ) : (
+          <NavLink
+            to="/auth"
+            className={cn(
+              "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+              "hover:bg-slate-800/60 group",
+              location.pathname === "/auth"
+                ? "bg-gradient-to-r from-green-500/20 to-green-600/10 border border-green-500/30 text-green-400"
+                : "text-slate-400 hover:text-slate-200"
+            )}
+          >
+            <div
+              className={cn(
+                "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                location.pathname === "/auth"
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-slate-800/50 text-slate-400 group-hover:bg-slate-700/50 group-hover:text-slate-200"
+              )}
+            >
+              <User className="w-5 h-5" />
+            </div>
+            
+            {!collapsed && (
+              <div className="flex-1 min-w-0 fade-in">
+                <p className={cn(
+                  "font-medium text-sm truncate",
+                  location.pathname === "/auth" ? "text-green-400" : "text-slate-200"
+                )}>
+                  Login / Sign Up
+                </p>
+              </div>
+            )}
+          </NavLink>
+        )}
       </nav>
 
       {/* Direct Support Section */}
