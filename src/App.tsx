@@ -10,6 +10,8 @@ import Sports from "./pages/Sports";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import Internships from "./pages/Internships";
+import Alumni from "./pages/Alumni";
 import NotFound from "./pages/NotFound";
 import FloatingAIButton from "./components/FloatingAIButton";
 
@@ -29,6 +31,8 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/internships" element={<Internships />} />
+          <Route path="/alumni" element={<Alumni />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <FloatingAIButton />

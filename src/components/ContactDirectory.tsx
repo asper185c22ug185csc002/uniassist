@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   Phone,
   Mail,
@@ -8,8 +8,6 @@ import {
   Send,
   User,
   MessageSquare,
-  Clock,
-  Trash2,
   ExternalLink,
   FlaskConical,
   Calculator,
@@ -23,10 +21,12 @@ import {
   Loader2,
   Navigation,
   Globe,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useDepartments } from "@/hooks/useUniversityData";
+import { supabase } from "@/integrations/supabase/client";
 
 const GOOGLE_MAPS_URL = "https://www.google.com/maps/place/Periyar+University/@11.7168999,78.0808945,17z";
 
@@ -82,46 +82,26 @@ interface InquirySubmission {
   id: string;
   name: string;
   email: string;
-  department: string;
+  subject: string;
   message: string;
-  timestamp: string;
+  status: string;
+  created_at: string;
 }
-
-const STORAGE_KEY = "uniassist_inquiries";
 
 export const ContactDirectory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showInquiryForm, setShowInquiryForm] = useState(false);
-  const [inquiries, setInquiries] = useState<InquirySubmission[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    department: "",
+    subject: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch departments from database
   const { data: dbDepartments, isLoading } = useDepartments();
-
-  // Load inquiries from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setInquiries(JSON.parse(stored));
-      } catch {
-        console.error("Failed to parse stored inquiries");
-      }
-    }
-  }, []);
-
-  // Save inquiries to localStorage
-  const saveInquiries = (newInquiries: InquirySubmission[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newInquiries));
-    setInquiries(newInquiries);
-  };
 
   // Transform database departments to contact format
   const departments = useMemo(() => {
@@ -147,34 +127,32 @@ export const ContactDirectory = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.department || !formData.message) {
-      toast.error("Please fill all fields");
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("Please fill all required fields");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Simulate submission delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const { error } = await supabase.from('inquiries').insert([{
+        name: formData.name,
+        email: formData.email,
+        subject: formData.subject || 'General Inquiry',
+        message: formData.message,
+        status: 'pending',
+      }]);
 
-    const newInquiry: InquirySubmission = {
-      id: Date.now().toString(),
-      ...formData,
-      timestamp: new Date().toISOString(),
-    };
+      if (error) throw error;
 
-    saveInquiries([newInquiry, ...inquiries]);
-
-    toast.success("Inquiry submitted successfully!");
-    setFormData({ name: "", email: "", department: "", message: "" });
-    setShowInquiryForm(false);
-    setIsSubmitting(false);
-  };
-
-  const deleteInquiry = (id: string) => {
-    const updated = inquiries.filter((inq) => inq.id !== id);
-    saveInquiries(updated);
-    toast.success("Inquiry deleted");
+      toast.success("Inquiry submitted successfully! We will get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setShowInquiryForm(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to submit inquiry");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -353,26 +331,21 @@ export const ContactDirectory = () => {
             </div>
 
             <div className="mb-4">
-              <label className="text-sm text-slate-400 mb-1 block">Department</label>
+              <label className="text-sm text-slate-400 mb-1 block">Subject</label>
               <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                <select
-                  value={formData.department}
-                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50 appearance-none cursor-pointer"
-                >
-                  <option value="" className="bg-slate-900">Select a department</option>
-                  {departments.map((dept) => (
-                    <option key={dept.name} value={dept.name} className="bg-slate-900">
-                      {dept.name}
-                    </option>
-                  ))}
-                </select>
+                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  placeholder="What is your inquiry about?"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-500/50"
+                />
               </div>
             </div>
 
             <div className="mb-6">
-              <label className="text-sm text-slate-400 mb-1 block">Your Message</label>
+              <label className="text-sm text-slate-400 mb-1 block">Your Message *</label>
               <textarea
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -388,7 +361,10 @@ export const ContactDirectory = () => {
               className="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 text-slate-950 font-medium hover:from-orange-400 hover:to-orange-500 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
-                "Submitting..."
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Submitting...
+                </>
               ) : (
                 <>
                   <Send className="w-5 h-5" />
@@ -396,48 +372,11 @@ export const ContactDirectory = () => {
                 </>
               )}
             </button>
+            
+            <p className="text-xs text-slate-500 text-center mt-4">
+              Your inquiry will be stored and reviewed by the university administration.
+            </p>
           </form>
-
-          {/* Previous Inquiries */}
-          {inquiries.length > 0 && (
-            <div className="glass-dark rounded-2xl p-6">
-              <h3 className="font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                <Clock className="w-5 h-5 text-blue-400" />
-                Your Submitted Inquiries
-              </h3>
-              <div className="space-y-3">
-                {inquiries.map((inquiry) => (
-                  <div
-                    key={inquiry.id}
-                    className="bg-slate-800/50 rounded-xl p-4 flex items-start justify-between gap-4"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">
-                          {inquiry.department}
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          {new Date(inquiry.timestamp).toLocaleDateString("en-IN", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </div>
-                      <p className="text-sm text-slate-300 line-clamp-2">{inquiry.message}</p>
-                    </div>
-                    <button
-                      onClick={() => deleteInquiry(inquiry.id)}
-                      className="p-2 rounded-lg hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       ) : (
         /* Contact Cards */
