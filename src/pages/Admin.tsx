@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 
-type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events';
+type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -84,6 +84,9 @@ const Admin = () => {
       placement_stats: ['academic_year', 'students_placed', 'companies', 'highest_package', 'average_package'],
       top_recruiters: ['company_name', 'sector'],
       sports_events: ['title', 'category', 'event_date', 'venue', 'status'],
+      alumni: ['name', 'register_number', 'email', 'phone', 'graduation_year', 'department', 'current_job', 'company', 'is_approved'],
+      internship_areas: ['department', 'head_of_department', 'email', 'whatsapp_number'],
+      inquiries: ['name', 'email', 'subject', 'message', 'status'],
     };
     return columns[table] || [];
   };
@@ -97,6 +100,9 @@ const Admin = () => {
       sports_events: 'category',
       courses: 'degree_type',
       top_recruiters: 'sector',
+      alumni: 'department',
+      internship_areas: 'department',
+      inquiries: 'status',
     };
     return categoryColumns[table] || null;
   };
@@ -263,6 +269,9 @@ const Admin = () => {
                 <TabsTrigger value="placement_stats">Placements</TabsTrigger>
                 <TabsTrigger value="top_recruiters">Recruiters</TabsTrigger>
                 <TabsTrigger value="sports_events">Sports</TabsTrigger>
+                <TabsTrigger value="alumni">Alumni</TabsTrigger>
+                <TabsTrigger value="internship_areas">Internships</TabsTrigger>
+                <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
               </TabsList>
 
               {/* Search and Filter Bar */}
