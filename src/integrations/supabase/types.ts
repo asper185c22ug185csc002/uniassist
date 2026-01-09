@@ -44,6 +44,78 @@ export type Database = {
         }
         Relationships: []
       }
+      alumni: {
+        Row: {
+          achievements: string | null
+          address: string | null
+          areas_of_expertise: string[] | null
+          availability_status: string | null
+          company: string | null
+          created_at: string
+          current_job: string | null
+          date_of_birth: string
+          degree: string | null
+          department: string | null
+          email: string | null
+          graduation_year: string | null
+          id: string
+          is_approved: boolean | null
+          is_self_registered: boolean | null
+          name: string
+          phone: string | null
+          profile_photo_url: string | null
+          register_number: string
+          social_links: Json | null
+          updated_at: string
+        }
+        Insert: {
+          achievements?: string | null
+          address?: string | null
+          areas_of_expertise?: string[] | null
+          availability_status?: string | null
+          company?: string | null
+          created_at?: string
+          current_job?: string | null
+          date_of_birth: string
+          degree?: string | null
+          department?: string | null
+          email?: string | null
+          graduation_year?: string | null
+          id?: string
+          is_approved?: boolean | null
+          is_self_registered?: boolean | null
+          name: string
+          phone?: string | null
+          profile_photo_url?: string | null
+          register_number: string
+          social_links?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          achievements?: string | null
+          address?: string | null
+          areas_of_expertise?: string[] | null
+          availability_status?: string | null
+          company?: string | null
+          created_at?: string
+          current_job?: string | null
+          date_of_birth?: string
+          degree?: string | null
+          department?: string | null
+          email?: string | null
+          graduation_year?: string | null
+          id?: string
+          is_approved?: boolean | null
+          is_self_registered?: boolean | null
+          name?: string
+          phone?: string | null
+          profile_photo_url?: string | null
+          register_number?: string
+          social_links?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cdoe_programs: {
         Row: {
           created_at: string
@@ -295,6 +367,66 @@ export type Database = {
           rules?: string[] | null
           total_capacity?: string | null
           total_reviews?: number | null
+        }
+        Relationships: []
+      }
+      inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      internship_areas: {
+        Row: {
+          areas_of_expertise: string[] | null
+          created_at: string
+          department: string
+          email: string | null
+          head_of_department: string | null
+          id: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          areas_of_expertise?: string[] | null
+          created_at?: string
+          department: string
+          email?: string | null
+          head_of_department?: string | null
+          id?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          areas_of_expertise?: string[] | null
+          created_at?: string
+          department?: string
+          email?: string | null
+          head_of_department?: string | null
+          id?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
