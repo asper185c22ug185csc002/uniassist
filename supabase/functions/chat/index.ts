@@ -11,6 +11,17 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Check if user is admin
+async function checkIsAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .single();
+  return !!data;
+}
+
 // Function to fetch university data from database
 async function fetchUniversityData() {
   console.log("Fetching university data from database...");
@@ -31,7 +42,8 @@ async function fetchUniversityData() {
     clubsResult,
     placementResult,
     recruitersResult,
-    newsResult
+    newsResult,
+    industrialVisitsResult
   ] = await Promise.all([
     supabase.from("departments").select("*"),
     supabase.from("courses").select("*, departments(name)"),
@@ -47,7 +59,8 @@ async function fetchUniversityData() {
     supabase.from("student_clubs").select("*"),
     supabase.from("placement_stats").select("*"),
     supabase.from("top_recruiters").select("*"),
-    supabase.from("news_feed").select("*").eq("is_active", true)
+    supabase.from("news_feed").select("*").eq("is_active", true),
+    supabase.from("industrial_visits").select("*")
   ]);
 
   return {
@@ -65,12 +78,13 @@ async function fetchUniversityData() {
     studentClubs: clubsResult.data || [],
     placementStats: placementResult.data || [],
     topRecruiters: recruitersResult.data || [],
-    newsFeed: newsResult.data || []
+    newsFeed: newsResult.data || [],
+    industrialVisits: industrialVisitsResult.data || []
   };
 }
 
 // Build dynamic system prompt with database data
-function buildSystemPrompt(data: Awaited<ReturnType<typeof fetchUniversityData>>) {
+function buildSystemPrompt(data: Awaited<ReturnType<typeof fetchUniversityData>>, isAdmin: boolean) {
   // Build university info section
   const infoMap = new Map(data.universityInfo.map(i => [i.key, i.value]));
   
@@ -148,9 +162,69 @@ ${deptCourses.length > 0 ? `Courses:\n${coursesList}` : ""}`;
     `- ${n.title}: ${n.description} (${n.category})`
   ).join("\n");
 
+  // Build industrial visits section
+  const ivSection = data.industrialVisits.map(iv =>
+    `- ${iv.title}: ${iv.department} visiting ${iv.destination} (${iv.duration}) - ${iv.status}`
+  ).join("\n");
+
+  // Admin editing instructions
+  const adminInstructions = isAdmin ? `
+
+## ADMIN EDITING CAPABILITIES
+You are logged in as an ADMIN. You can help edit database entries using these commands:
+
+### Available Edit Commands (respond with these JSON blocks):
+When the admin asks to update/edit/change any data, respond with the appropriate JSON command block:
+
+1. **Update Hostel Info**: 
+\`\`\`json
+{"action": "update_hostel", "field": "monthly_rent|mess_charges|room_capacity|total_capacity|location", "value": "new value"}
+\`\`\`
+
+2. **Update University Info**:
+\`\`\`json
+{"action": "update_university_info", "key": "admin_phone|website|nirf_ranking|etc", "value": "new value"}
+\`\`\`
+
+3. **Add News**:
+\`\`\`json
+{"action": "add_news", "title": "News Title", "description": "Description", "category": "Category"}
+\`\`\`
+
+4. **Update Placement Stats**:
+\`\`\`json
+{"action": "update_placement", "academic_year": "2024-25", "field": "students_placed|companies|highest_package|average_package", "value": "new value"}
+\`\`\`
+
+5. **Add Industrial Visit**:
+\`\`\`json
+{"action": "add_iv", "title": "IV Title", "department": "Dept", "destination": "Place", "duration": "1 Day", "visit_date": "YYYY-MM-DD"}
+\`\`\`
+
+6. **Approve/Reject Alumni**:
+\`\`\`json
+{"action": "approve_alumni", "register_number": "REG123", "approve": true}
+\`\`\`
+
+### How to Use:
+- When admin says "update hostel rent to ₹3000", respond with the JSON command
+- After showing the command, explain what will be updated
+- The frontend will detect these commands and execute them
+- Always confirm what you're updating and ask for verification
+
+### Current Editable Tables:
+- hostel_info: Rent, mess charges, amenities, rules
+- university_info: Contact details, rankings, portals
+- news_feed: Add announcements
+- placement_stats: Placement data
+- industrial_visits: IV schedules
+- alumni: Approve/reject registrations
+- departments, courses, facilities, etc.
+` : "";
+
   return `You are UniAssist AI, the official AI-powered information assistant for Periyar University, Salem, Tamil Nadu, India.
 All data provided below is from the official university database and should be used to answer queries accurately.
-
+${adminInstructions}
 ## University Overview
 - Name: ${infoMap.get("name") || "Periyar University"}
 - Established: ${infoMap.get("established") || "17th September 1997"}
@@ -198,6 +272,9 @@ ${facilitiesSection}
 ## Hostel Information
 ${hostelSection}
 
+## Industrial Visits (IV)
+${ivSection || "No upcoming industrial visits scheduled"}
+
 ## Placement Statistics
 ${placementSection}
 
@@ -216,7 +293,7 @@ ${newsSection}
 ## Your Role
 - Provide accurate information ONLY from the database data above
 - Use EXACT fees, ratings, and statistics from the data
-- Help with admissions, courses, fees, library access, hostel queries
+- Help with admissions, courses, fees, library access, hostel queries, industrial visits
 - Guide users to appropriate official resources and contacts
 - Be polite, concise, and student-friendly
 - Use bullet points for clarity when appropriate
@@ -237,7 +314,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, userId } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -247,17 +324,25 @@ serve(async (req) => {
 
     console.log("Processing chat request with", messages.length, "messages");
 
+    // Check if user is admin
+    let isAdmin = false;
+    if (userId) {
+      isAdmin = await checkIsAdmin(userId);
+      console.log("User admin status:", isAdmin);
+    }
+
     // Fetch university data from database
     const universityData = await fetchUniversityData();
     console.log("Fetched university data:", {
       departments: universityData.departments.length,
       courses: universityData.courses.length,
       libraryBooks: universityData.libraryBooks.length,
-      facilities: universityData.facilities.length
+      facilities: universityData.facilities.length,
+      industrialVisits: universityData.industrialVisits.length
     });
 
     // Build dynamic system prompt with database data
-    const systemPrompt = buildSystemPrompt(universityData);
+    const systemPrompt = buildSystemPrompt(universityData, isAdmin);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

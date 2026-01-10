@@ -54,8 +54,11 @@ export const Header = () => {
             <a href="#chat" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Chat
             </a>
-            <a href="#about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              About
+            <a href="/alumni" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Alumni
+            </a>
+            <a href="/internships" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Internships
             </a>
           </nav>
 
@@ -134,11 +137,18 @@ export const Header = () => {
                 Chat
               </a>
               <a 
-                href="#about" 
+                href="/alumni" 
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                About
+                Alumni
+              </a>
+              <a 
+                href="/internships" 
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Internships
               </a>
               {isAdmin && (
                 <a 
