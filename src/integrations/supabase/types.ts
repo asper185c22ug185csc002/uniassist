@@ -370,6 +370,51 @@ export type Database = {
         }
         Relationships: []
       }
+      industrial_visits: {
+        Row: {
+          coordinator_contact: string | null
+          coordinator_name: string | null
+          created_at: string
+          department: string | null
+          description: string | null
+          destination: string | null
+          duration: string | null
+          id: string
+          objectives: string[] | null
+          status: string | null
+          title: string
+          visit_date: string | null
+        }
+        Insert: {
+          coordinator_contact?: string | null
+          coordinator_name?: string | null
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          destination?: string | null
+          duration?: string | null
+          id?: string
+          objectives?: string[] | null
+          status?: string | null
+          title: string
+          visit_date?: string | null
+        }
+        Update: {
+          coordinator_contact?: string | null
+          coordinator_name?: string | null
+          created_at?: string
+          department?: string | null
+          description?: string | null
+          destination?: string | null
+          duration?: string | null
+          id?: string
+          objectives?: string[] | null
+          status?: string | null
+          title?: string
+          visit_date?: string | null
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           created_at: string
