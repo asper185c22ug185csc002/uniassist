@@ -14,7 +14,10 @@ import {
   Clock, 
   CheckCircle,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  MapPin,
+  Calendar,
+  Bus
 } from 'lucide-react';
 
 const Internships = () => {
@@ -27,6 +30,18 @@ const Internships = () => {
         .from('internship_areas')
         .select('*')
         .order('department');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: industrialVisits, isLoading: ivLoading } = useQuery({
+    queryKey: ['industrial_visits'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('industrial_visits')
+        .select('*')
+        .order('visit_date');
       if (error) throw error;
       return data;
     },
@@ -179,6 +194,38 @@ const Internships = () => {
             No internship areas found matching your search.
           </div>
         )}
+
+        {/* Industrial Visits Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <Bus className="w-6 h-6 text-primary" />
+            Industrial Visits (IV)
+          </h2>
+          {ivLoading ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {industrialVisits?.map((iv: any) => (
+                <Card key={iv.id} className="hover:border-primary/50 transition-colors">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold text-lg mb-2">{iv.title}</h3>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <p className="flex items-center gap-2"><Building className="w-4 h-4" /> {iv.department}</p>
+                      <p className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {iv.destination}</p>
+                      <p className="flex items-center gap-2"><Clock className="w-4 h-4" /> {iv.duration}</p>
+                      {iv.visit_date && <p className="flex items-center gap-2"><Calendar className="w-4 h-4" /> {iv.visit_date}</p>}
+                    </div>
+                    <Badge variant={iv.status === 'upcoming' ? 'default' : 'secondary'} className="mt-3">
+                      {iv.status}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Apply Section */}
         <Card className="mt-12">

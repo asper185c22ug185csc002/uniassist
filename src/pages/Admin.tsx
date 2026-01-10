@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 
-type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries';
+type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries' | 'industrial_visits';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -87,6 +87,7 @@ const Admin = () => {
       alumni: ['name', 'register_number', 'email', 'phone', 'graduation_year', 'department', 'current_job', 'company', 'is_approved'],
       internship_areas: ['department', 'head_of_department', 'email', 'whatsapp_number'],
       inquiries: ['name', 'email', 'subject', 'message', 'status'],
+      industrial_visits: ['title', 'department', 'destination', 'duration', 'visit_date', 'status'],
     };
     return columns[table] || [];
   };
@@ -271,6 +272,7 @@ const Admin = () => {
                 <TabsTrigger value="sports_events">Sports</TabsTrigger>
                 <TabsTrigger value="alumni">Alumni</TabsTrigger>
                 <TabsTrigger value="internship_areas">Internships</TabsTrigger>
+                <TabsTrigger value="industrial_visits">IV</TabsTrigger>
                 <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
               </TabsList>
 

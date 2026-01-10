@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Sparkles, Coins, GraduationCap, Library, Home, History, Download, Plus } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles, Coins, GraduationCap, Library, Home, History, Download, Plus, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import periyarLogo from "@/assets/periyar-logo.jpg";
 import { useChatHistory, Message } from "@/hooks/useChatHistory";
 import { ChatHistorySidebar } from "@/components/ChatHistorySidebar";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -40,6 +42,7 @@ export const ChatInterface = () => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { user, isAdmin } = useAuth();
 
   const {
     sessions,
@@ -79,6 +82,47 @@ export const ChatInterface = () => {
     sendMessage(input.trim());
   };
 
+  // Function to execute admin edit commands found in AI response
+  const executeAdminCommand = async (jsonStr: string) => {
+    try {
+      const command = JSON.parse(jsonStr);
+      console.log("Executing admin command:", command);
+      
+      switch (command.action) {
+        case "update_hostel":
+          await supabase.from("hostel_info").update({ [command.field]: command.value }).neq("id", "00000000-0000-0000-0000-000000000000");
+          toast.success(`Updated hostel ${command.field} to ${command.value}`);
+          break;
+        case "update_university_info":
+          await supabase.from("university_info").update({ value: command.value }).eq("key", command.key);
+          toast.success(`Updated ${command.key} to ${command.value}`);
+          break;
+        case "add_news":
+          await supabase.from("news_feed").insert({ title: command.title, description: command.description, category: command.category, is_active: true });
+          toast.success("Added new announcement");
+          break;
+        case "add_iv":
+          await supabase.from("industrial_visits").insert({
+            title: command.title,
+            department: command.department,
+            destination: command.destination,
+            duration: command.duration,
+            visit_date: command.visit_date
+          });
+          toast.success("Added industrial visit");
+          break;
+        case "approve_alumni":
+          await supabase.from("alumni").update({ is_approved: command.approve }).eq("register_number", command.register_number);
+          toast.success(`Alumni ${command.approve ? "approved" : "rejected"}`);
+          break;
+        default:
+          console.log("Unknown command:", command.action);
+      }
+    } catch (error) {
+      console.error("Failed to execute command:", error);
+    }
+  };
+
   const sendMessage = async (content: string) => {
     const userMessage: Message = { role: "user", content };
     setMessages((prev) => [...prev, userMessage]);
@@ -94,7 +138,10 @@ export const ChatInterface = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMessage] }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          userId: user?.id || null 
+        }),
       });
 
       if (!response.ok) {
@@ -156,6 +203,14 @@ export const ChatInterface = () => {
             textBuffer = line + "\n" + textBuffer;
             break;
           }
+        }
+      }
+      
+      // Check for admin commands in the final response
+      if (isAdmin && assistantContent) {
+        const jsonMatch = assistantContent.match(/```json\s*(\{[\s\S]*?"action"[\s\S]*?\})\s*```/);
+        if (jsonMatch) {
+          await executeAdminCommand(jsonMatch[1]);
         }
       }
     } catch (error) {

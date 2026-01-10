@@ -11,6 +11,8 @@ import {
   User,
   LogOut,
   Shield,
+  Users,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,6 +43,18 @@ const menuItems = [
     icon: Trophy,
     path: "/sports",
     description: "Events & campus life",
+  },
+  {
+    title: "Internships & IV",
+    icon: Briefcase,
+    path: "/internships",
+    description: "Industrial training",
+  },
+  {
+    title: "Alumni Network",
+    icon: Users,
+    path: "/alumni",
+    description: "Connect with alumni",
   },
   {
     title: "Contact Directory",
