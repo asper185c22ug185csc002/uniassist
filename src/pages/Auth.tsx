@@ -4,19 +4,31 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Mail, Lock, KeyRound } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, KeyRound, ShieldCheck, User, GraduationCap, Users } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
 type AuthMode = 'login' | 'signup' | 'forgot-password';
+type UserRole = 'admin' | 'student' | 'alumni' | 'user';
+
+const ADMIN_EMAIL = 'puadmin@gmail.com';
+
+const roleConfig = {
+  admin: { icon: ShieldCheck, label: 'Admin', color: 'text-red-500' },
+  student: { icon: GraduationCap, label: 'Student', color: 'text-blue-500' },
+  alumni: { icon: Users, label: 'Alumni', color: 'text-green-500' },
+  user: { icon: User, label: 'User', color: 'text-muted-foreground' },
+};
 
 const Auth = () => {
   const [mode, setMode] = useState<AuthMode>('login');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('user');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +44,15 @@ const Auth = () => {
       navigate('/');
     }
   }, [user, navigate]);
+
+  // Auto-fill admin email when admin role is selected
+  useEffect(() => {
+    if (selectedRole === 'admin') {
+      setEmail(ADMIN_EMAIL);
+    } else if (email === ADMIN_EMAIL) {
+      setEmail('');
+    }
+  }, [selectedRole]);
 
   const validateForm = (checkPassword = true) => {
     const newErrors: { email?: string; password?: string } = {};
@@ -87,6 +108,16 @@ const Auth = () => {
     
     if (!validateForm()) return;
     
+    // Validate admin login
+    if (selectedRole === 'admin' && email !== ADMIN_EMAIL) {
+      toast({
+        title: 'Access Denied',
+        description: 'Admin login requires the official admin email.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     try {
@@ -108,11 +139,23 @@ const Auth = () => {
           }
         } else {
           toast({
-            title: 'Welcome back!',
-            description: 'You have successfully logged in.',
+            title: selectedRole === 'admin' ? 'Welcome Admin!' : 'Welcome back!',
+            description: selectedRole === 'admin' 
+              ? 'You have admin access to manage university data.'
+              : 'You have successfully logged in.',
           });
         }
       } else {
+        if (selectedRole === 'admin') {
+          toast({
+            title: 'Registration Not Allowed',
+            description: 'Admin accounts cannot be registered. Please contact the administrator.',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
+        
         const { error } = await signUp(email, password);
         if (error) {
           if (error.message.includes('User already registered')) {
@@ -143,7 +186,7 @@ const Auth = () => {
 
   const getTitle = () => {
     switch (mode) {
-      case 'login': return 'Welcome Back';
+      case 'login': return selectedRole === 'admin' ? 'Admin Login' : 'Welcome Back';
       case 'signup': return 'Create Account';
       case 'forgot-password': return 'Reset Password';
     }
@@ -151,11 +194,15 @@ const Auth = () => {
 
   const getDescription = () => {
     switch (mode) {
-      case 'login': return 'Sign in to access your account or admin panel';
+      case 'login': return selectedRole === 'admin' 
+        ? 'Sign in with admin credentials to manage university data'
+        : 'Sign in to access your account';
       case 'signup': return 'Create an account to save your preferences';
       case 'forgot-password': return 'Enter your email to receive a password reset link';
     }
   };
+
+  const RoleIcon = roleConfig[selectedRole].icon;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-4 relative overflow-hidden">
@@ -180,7 +227,8 @@ const Auth = () => {
             </div>
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+              <RoleIcon className={`w-6 h-6 ${roleConfig[selectedRole].color}`} />
               {getTitle()}
             </CardTitle>
             <CardDescription className="mt-2">
@@ -228,6 +276,29 @@ const Auth = () => {
             </form>
           ) : (
             <>
+              {/* Role Selector */}
+              <div className="mb-6">
+                <label className="text-sm font-medium mb-2 block">Login as:</label>
+                <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as UserRole)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-card border-border">
+                    {Object.entries(roleConfig).map(([key, config]) => {
+                      const Icon = config.icon;
+                      return (
+                        <SelectItem key={key} value={key}>
+                          <div className="flex items-center gap-2">
+                            <Icon className={`w-4 h-4 ${config.color}`} />
+                            {config.label}
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <div className="relative">
@@ -239,10 +310,14 @@ const Auth = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       className="pl-10"
                       autoComplete="email"
+                      disabled={selectedRole === 'admin'}
                     />
                   </div>
                   {errors.email && (
                     <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                  {selectedRole === 'admin' && (
+                    <p className="text-xs text-muted-foreground">Admin email is fixed to {ADMIN_EMAIL}</p>
                   )}
                 </div>
                 
@@ -284,7 +359,7 @@ const Auth = () => {
                 )}
                 
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+                  {isLoading ? 'Please wait...' : mode === 'login' ? `Sign In as ${roleConfig[selectedRole].label}` : 'Create Account'}
                 </Button>
               </form>
               
@@ -306,20 +381,22 @@ const Auth = () => {
                 Continue without signing in
               </Button>
               
-              <div className="mt-6 text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode(mode === 'login' ? 'signup' : 'login');
-                    setErrors({});
-                  }}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {mode === 'login' 
-                    ? "Don't have an account? Sign up" 
-                    : 'Already have an account? Sign in'}
-                </button>
-              </div>
+              {selectedRole !== 'admin' && (
+                <div className="mt-6 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode(mode === 'login' ? 'signup' : 'login');
+                      setErrors({});
+                    }}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {mode === 'login' 
+                      ? "Don't have an account? Sign up" 
+                      : 'Already have an account? Sign in'}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </CardContent>
