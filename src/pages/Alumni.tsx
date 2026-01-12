@@ -27,6 +27,7 @@ import {
   Star,
   Users
 } from 'lucide-react';
+import { alumniRegistrationSchema, alumniLoginSchema, formatValidationErrors } from '@/lib/validation';
 
 const Alumni = () => {
   const { toast } = useToast();
@@ -77,12 +78,25 @@ const Alumni = () => {
     setIsSubmitting(true);
     
     try {
+      // Validate input with Zod
+      const validation = alumniLoginSchema.safeParse(loginData);
+      if (!validation.success) {
+        const errors = formatValidationErrors(validation.error);
+        toast({
+          title: 'Validation Error',
+          description: errors[0],
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Format DOB to match database format (YYYY-MM-DD)
       const { data, error } = await supabase
         .from('alumni')
         .select('*')
-        .eq('register_number', loginData.registerNumber)
-        .eq('date_of_birth', loginData.dob)
+        .eq('register_number', validation.data.registerNumber)
+        .eq('date_of_birth', validation.data.dob)
         .maybeSingle();
 
       if (error) throw error;
@@ -95,16 +109,17 @@ const Alumni = () => {
         setShowLoginDialog(false);
         // Could store in localStorage/session for profile editing
       } else {
+        // Generic error message to prevent enumeration
         toast({
           title: 'Login Failed',
-          description: 'Invalid register number or date of birth.',
+          description: 'Invalid credentials. Please check your details.',
           variant: 'destructive',
         });
       }
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: 'An error occurred. Please try again.',
         variant: 'destructive',
       });
     } finally {
@@ -117,9 +132,54 @@ const Alumni = () => {
     setIsSubmitting(true);
 
     try {
+      // Validate input with Zod
+      const validation = alumniRegistrationSchema.safeParse(registerData);
+      if (!validation.success) {
+        const errors = formatValidationErrors(validation.error);
+        toast({
+          title: 'Validation Error',
+          description: errors[0],
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const validData = validation.data;
+
+      // Check for duplicate register number
+      const { data: existing } = await supabase
+        .from('alumni')
+        .select('id')
+        .eq('register_number', validData.register_number)
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: 'Registration Failed',
+          description: 'This register number is already registered.',
+          variant: 'destructive',
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.from('alumni').insert([{
-        ...registerData,
-        areas_of_expertise: registerData.areas_of_expertise.split(',').map(s => s.trim()).filter(Boolean),
+        name: validData.name,
+        register_number: validData.register_number,
+        date_of_birth: validData.date_of_birth,
+        email: validData.email || null,
+        phone: validData.phone || null,
+        graduation_year: validData.graduation_year || null,
+        department: validData.department || null,
+        degree: validData.degree || null,
+        current_job: validData.current_job || null,
+        company: validData.company || null,
+        achievements: validData.achievements || null,
+        address: validData.address || null,
+        areas_of_expertise: validData.areas_of_expertise 
+          ? validData.areas_of_expertise.split(',').map(s => s.trim()).filter(Boolean) 
+          : [],
         is_self_registered: true,
         is_approved: false,
       }]);
@@ -149,7 +209,7 @@ const Alumni = () => {
     } catch (error: any) {
       toast({
         title: 'Registration Failed',
-        description: error.message,
+        description: 'An error occurred. Please try again.',
         variant: 'destructive',
       });
     } finally {

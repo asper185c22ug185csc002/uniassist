@@ -82,44 +82,57 @@ export const ChatInterface = () => {
     sendMessage(input.trim());
   };
 
-  // Function to execute admin edit commands found in AI response
+  // Function to execute admin edit commands via server-side edge function
   const executeAdminCommand = async (jsonStr: string) => {
     try {
       const command = JSON.parse(jsonStr);
-      console.log("Executing admin command:", command);
+      console.log("Sending admin command to server:", command.action);
       
+      // Get the current session for auth
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Authentication required for admin commands");
+        return;
+      }
+
+      // Execute command via server-side edge function with proper auth
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-command`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(command),
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok || !result.success) {
+        toast.error(result.error || "Failed to execute command");
+        return;
+      }
+
+      // Show success message based on action
       switch (command.action) {
         case "update_hostel":
-          await supabase.from("hostel_info").update({ [command.field]: command.value }).neq("id", "00000000-0000-0000-0000-000000000000");
           toast.success(`Updated hostel ${command.field} to ${command.value}`);
           break;
         case "update_university_info":
-          await supabase.from("university_info").update({ value: command.value }).eq("key", command.key);
           toast.success(`Updated ${command.key} to ${command.value}`);
           break;
         case "add_news":
-          await supabase.from("news_feed").insert({ title: command.title, description: command.description, category: command.category, is_active: true });
           toast.success("Added new announcement");
           break;
         case "add_iv":
-          await supabase.from("industrial_visits").insert({
-            title: command.title,
-            department: command.department,
-            destination: command.destination,
-            duration: command.duration,
-            visit_date: command.visit_date
-          });
           toast.success("Added industrial visit");
           break;
         case "approve_alumni":
-          await supabase.from("alumni").update({ is_approved: command.approve }).eq("register_number", command.register_number);
           toast.success(`Alumni ${command.approve ? "approved" : "rejected"}`);
           break;
-        default:
-          console.log("Unknown command:", command.action);
       }
     } catch (error) {
       console.error("Failed to execute command:", error);
+      toast.error("Failed to execute admin command");
     }
   };
 
