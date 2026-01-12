@@ -11,6 +11,47 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
+const RATE_LIMIT_MAX_REQUESTS = 30; // Max 30 requests per minute per user
+
+// In-memory rate limit store (resets on function cold start, but provides basic protection)
+const rateLimitStore = new Map<string, { count: number; windowStart: number }>();
+
+function checkRateLimit(userId: string): { allowed: boolean; remaining: number; resetIn: number } {
+  const now = Date.now();
+  const userLimit = rateLimitStore.get(userId);
+
+  if (!userLimit || now - userLimit.windowStart > RATE_LIMIT_WINDOW_MS) {
+    // New window or expired window
+    rateLimitStore.set(userId, { count: 1, windowStart: now });
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1, resetIn: RATE_LIMIT_WINDOW_MS };
+  }
+
+  if (userLimit.count >= RATE_LIMIT_MAX_REQUESTS) {
+    const resetIn = RATE_LIMIT_WINDOW_MS - (now - userLimit.windowStart);
+    return { allowed: false, remaining: 0, resetIn };
+  }
+
+  userLimit.count++;
+  rateLimitStore.set(userId, userLimit);
+  return { 
+    allowed: true, 
+    remaining: RATE_LIMIT_MAX_REQUESTS - userLimit.count, 
+    resetIn: RATE_LIMIT_WINDOW_MS - (now - userLimit.windowStart) 
+  };
+}
+
+// Clean up expired entries periodically (prevents memory leak)
+function cleanupRateLimitStore() {
+  const now = Date.now();
+  for (const [userId, limit] of rateLimitStore.entries()) {
+    if (now - limit.windowStart > RATE_LIMIT_WINDOW_MS * 2) {
+      rateLimitStore.delete(userId);
+    }
+  }
+}
+
 // Validate admin role server-side
 async function validateAdminRole(authHeader: string): Promise<{ valid: boolean; userId: string | null }> {
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -125,6 +166,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Periodically cleanup expired rate limit entries
+  cleanupRateLimitStore();
+
   try {
     // Validate admin role server-side
     const authHeader = req.headers.get("Authorization") || "";
@@ -138,8 +182,31 @@ serve(async (req) => {
       );
     }
 
+    // Check rate limit for this admin user
+    const rateLimit = checkRateLimit(userId!);
+    if (!rateLimit.allowed) {
+      console.warn("Rate limit exceeded for admin", { userId, resetIn: rateLimit.resetIn });
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Rate limit exceeded. Please try again later.",
+          retryAfter: Math.ceil(rateLimit.resetIn / 1000)
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            "Content-Type": "application/json",
+            "Retry-After": String(Math.ceil(rateLimit.resetIn / 1000)),
+            "X-RateLimit-Remaining": String(rateLimit.remaining),
+            "X-RateLimit-Reset": String(Math.ceil(rateLimit.resetIn / 1000))
+          } 
+        }
+      );
+    }
+
     const command = await req.json();
-    console.log("Admin command received:", { action: command.action, userId });
+    console.log("Admin command received:", { action: command.action, userId, rateLimitRemaining: rateLimit.remaining });
 
     // Validate command parameters
     const validation = validateCommand(command);
