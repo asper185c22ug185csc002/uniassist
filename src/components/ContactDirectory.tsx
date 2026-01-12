@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useDepartments } from "@/hooks/useUniversityData";
 import { supabase } from "@/integrations/supabase/client";
+import { inquirySchema, formatValidationErrors } from "@/lib/validation";
 
 const GOOGLE_MAPS_URL = "https://www.google.com/maps/place/Periyar+University/@11.7168999,78.0808945,17z";
 
@@ -127,19 +128,25 @@ export const ContactDirectory = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error("Please fill all required fields");
+    
+    // Validate input with Zod
+    const validation = inquirySchema.safeParse(formData);
+    if (!validation.success) {
+      const errors = formatValidationErrors(validation.error);
+      toast.error(errors[0]);
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      const validData = validation.data;
+      
       const { error } = await supabase.from('inquiries').insert([{
-        name: formData.name,
-        email: formData.email,
-        subject: formData.subject || 'General Inquiry',
-        message: formData.message,
+        name: validData.name,
+        email: validData.email,
+        subject: validData.subject || 'General Inquiry',
+        message: validData.message,
         status: 'pending',
       }]);
 
@@ -149,7 +156,7 @@ export const ContactDirectory = () => {
       setFormData({ name: "", email: "", subject: "", message: "" });
       setShowInquiryForm(false);
     } catch (error: any) {
-      toast.error(error.message || "Failed to submit inquiry");
+      toast.error("Failed to submit inquiry. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
