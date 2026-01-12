@@ -735,7 +735,132 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      alumni_public: {
+        Row: {
+          achievements: string | null
+          areas_of_expertise: string[] | null
+          availability_status: string | null
+          company: string | null
+          created_at: string | null
+          current_job: string | null
+          degree: string | null
+          department: string | null
+          graduation_year: string | null
+          id: string | null
+          is_approved: boolean | null
+          is_self_registered: boolean | null
+          name: string | null
+          profile_photo_url: string | null
+          register_number: string | null
+          social_links: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          achievements?: string | null
+          areas_of_expertise?: string[] | null
+          availability_status?: string | null
+          company?: string | null
+          created_at?: string | null
+          current_job?: string | null
+          degree?: string | null
+          department?: string | null
+          graduation_year?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          is_self_registered?: boolean | null
+          name?: string | null
+          profile_photo_url?: string | null
+          register_number?: string | null
+          social_links?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          achievements?: string | null
+          areas_of_expertise?: string[] | null
+          availability_status?: string | null
+          company?: string | null
+          created_at?: string | null
+          current_job?: string | null
+          degree?: string | null
+          department?: string | null
+          graduation_year?: string | null
+          id?: string | null
+          is_approved?: boolean | null
+          is_self_registered?: boolean | null
+          name?: string | null
+          profile_photo_url?: string | null
+          register_number?: string | null
+          social_links?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      industrial_visits_public: {
+        Row: {
+          coordinator_name: string | null
+          created_at: string | null
+          department: string | null
+          description: string | null
+          destination: string | null
+          duration: string | null
+          id: string | null
+          objectives: string[] | null
+          status: string | null
+          title: string | null
+          visit_date: string | null
+        }
+        Insert: {
+          coordinator_name?: string | null
+          created_at?: string | null
+          department?: string | null
+          description?: string | null
+          destination?: string | null
+          duration?: string | null
+          id?: string | null
+          objectives?: string[] | null
+          status?: string | null
+          title?: string | null
+          visit_date?: string | null
+        }
+        Update: {
+          coordinator_name?: string | null
+          created_at?: string | null
+          department?: string | null
+          description?: string | null
+          destination?: string | null
+          duration?: string | null
+          id?: string | null
+          objectives?: string[] | null
+          status?: string | null
+          title?: string | null
+          visit_date?: string | null
+        }
+        Relationships: []
+      }
+      internship_areas_public: {
+        Row: {
+          areas_of_expertise: string[] | null
+          created_at: string | null
+          department: string | null
+          head_of_department: string | null
+          id: string | null
+        }
+        Insert: {
+          areas_of_expertise?: string[] | null
+          created_at?: string | null
+          department?: string | null
+          head_of_department?: string | null
+          id?: string | null
+        }
+        Update: {
+          areas_of_expertise?: string[] | null
+          created_at?: string | null
+          department?: string | null
+          head_of_department?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
