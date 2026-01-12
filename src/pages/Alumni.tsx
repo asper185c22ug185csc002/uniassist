@@ -52,21 +52,71 @@ const Alumni = () => {
     areas_of_expertise: '',
   });
 
-  // Fetch approved alumni for chief guest listing
-  const { data: alumni, isLoading } = useQuery({
-    queryKey: ['approved_alumni'],
+  // Check if user is authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check auth status
+  useQuery({
+    queryKey: ['auth_status'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('alumni')
-        .select('*')
-        .eq('is_approved', true)
-        .order('graduation_year', { ascending: false });
-      if (error) throw error;
-      return data;
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAuthenticated(!!user);
+      return !!user;
     },
   });
 
-  const filteredAlumni = alumni?.filter(alum => 
+  // Alumni type for both views
+  type AlumniData = {
+    id: string;
+    name: string;
+    register_number: string;
+    degree?: string | null;
+    department?: string | null;
+    graduation_year?: string | null;
+    company?: string | null;
+    current_job?: string | null;
+    achievements?: string | null;
+    areas_of_expertise?: string[] | null;
+    availability_status?: string | null;
+    profile_photo_url?: string | null;
+    social_links?: any;
+    is_approved?: boolean | null;
+    is_self_registered?: boolean | null;
+    created_at: string;
+    updated_at: string;
+    // These are only available to authenticated users
+    email?: string | null;
+    phone?: string | null;
+    date_of_birth?: string;
+    address?: string | null;
+  };
+
+  // Fetch approved alumni - use public view for anonymous users (hides email, phone, DOB, address)
+  const { data: alumni, isLoading } = useQuery<AlumniData[]>({
+    queryKey: ['approved_alumni', isAuthenticated],
+    queryFn: async () => {
+      if (isAuthenticated) {
+        // Authenticated users can see full data
+        const { data, error } = await supabase
+          .from('alumni')
+          .select('*')
+          .eq('is_approved', true)
+          .order('graduation_year', { ascending: false });
+        if (error) throw error;
+        return data as AlumniData[];
+      } else {
+        // Anonymous users see public view without sensitive info
+        const { data, error } = await supabase
+          .from('alumni_public' as any)
+          .select('*')
+          .order('graduation_year', { ascending: false });
+        if (error) throw error;
+        return data as unknown as AlumniData[];
+      }
+    },
+  });
+
+  const filteredAlumni = alumni?.filter((alum: AlumniData) => 
     alum.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     alum.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     alum.company?.toLowerCase().includes(searchQuery.toLowerCase()) ||
