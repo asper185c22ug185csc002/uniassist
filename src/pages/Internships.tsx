@@ -37,36 +37,86 @@ const tourImages: Record<string, string> = {
 
 const defaultTourImage = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop';
 
+// Types for views
+type InternshipAreaData = {
+  id: string;
+  department: string;
+  head_of_department?: string | null;
+  areas_of_expertise?: string[] | null;
+  created_at: string;
+  // Only for authenticated users
+  email?: string | null;
+  whatsapp_number?: string | null;
+};
+
+type IndustrialVisitData = {
+  id: string;
+  title: string;
+  department?: string | null;
+  destination?: string | null;
+  duration?: string | null;
+  visit_date?: string | null;
+  description?: string | null;
+  objectives?: string[] | null;
+  coordinator_name?: string | null;
+  status?: string | null;
+  created_at: string;
+  // Only for authenticated users
+  coordinator_contact?: string | null;
+};
+
 const Internships = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: internshipAreas, isLoading } = useQuery({
-    queryKey: ['internship_areas'],
+  // Use full table for authenticated users, public view for anonymous
+  const { data: internshipAreas, isLoading } = useQuery<InternshipAreaData[]>({
+    queryKey: ['internship_areas', !!user],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('internship_areas')
-        .select('*')
-        .order('department');
-      if (error) throw error;
-      return data;
+      if (user) {
+        // Authenticated users can see full data including contact info
+        const { data, error } = await supabase
+          .from('internship_areas')
+          .select('*')
+          .order('department');
+        if (error) throw error;
+        return data as InternshipAreaData[];
+      } else {
+        // Anonymous users see public view without sensitive contact info
+        const { data, error } = await supabase
+          .from('internship_areas_public' as any)
+          .select('*')
+          .order('department');
+        if (error) throw error;
+        return data as unknown as InternshipAreaData[];
+      }
     },
   });
 
-  const { data: industrialVisits, isLoading: ivLoading } = useQuery({
-    queryKey: ['industrial_visits'],
+  // Use full table for authenticated users, public view for anonymous
+  const { data: industrialVisits, isLoading: ivLoading } = useQuery<IndustrialVisitData[]>({
+    queryKey: ['industrial_visits', !!user],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('industrial_visits')
-        .select('*')
-        .order('visit_date');
-      if (error) throw error;
-      return data;
+      if (user) {
+        const { data, error } = await supabase
+          .from('industrial_visits')
+          .select('*')
+          .order('visit_date');
+        if (error) throw error;
+        return data as IndustrialVisitData[];
+      } else {
+        const { data, error } = await supabase
+          .from('industrial_visits_public' as any)
+          .select('*')
+          .order('visit_date');
+        if (error) throw error;
+        return data as unknown as IndustrialVisitData[];
+      }
     },
   });
 
-  const filteredAreas = internshipAreas?.filter(area => 
+  const filteredAreas = internshipAreas?.filter((area: InternshipAreaData) => 
     area.department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     area.head_of_department?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     area.areas_of_expertise?.some((exp: string) => exp.toLowerCase().includes(searchQuery.toLowerCase()))
