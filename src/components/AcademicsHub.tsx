@@ -38,6 +38,9 @@ import {
   useNewsFeed,
   useUniversityInfo,
 } from "@/hooks/useUniversityData";
+import { AdminEditWrapper } from '@/components/AdminEditWrapper';
+import { useAuth } from '@/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Calculator,
@@ -96,6 +99,8 @@ const eligibilityCriteria = [
 export const AcademicsHub = () => {
   const [activeTab, setActiveTab] = useState<"departments" | "fees" | "admissions" | "placements" | "news">("departments");
   const [expandedDept, setExpandedDept] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch data from database
   const { data: departments, isLoading: loadingDepts } = useDepartmentsWithCourses();
@@ -107,6 +112,13 @@ export const AcademicsHub = () => {
   const { data: universityInfo } = useUniversityInfo();
 
   const isLoading = loadingDepts || loadingCdoe || loadingClubs || loadingPlacements || loadingRecruiters || loadingNews;
+
+  const refetchData = () => {
+    queryClient.invalidateQueries({ queryKey: ['departments'] });
+    queryClient.invalidateQueries({ queryKey: ['news_feed'] });
+    queryClient.invalidateQueries({ queryKey: ['placement_stats'] });
+    queryClient.invalidateQueries({ queryKey: ['student_clubs'] });
+  };
 
   if (isLoading) {
     return (
