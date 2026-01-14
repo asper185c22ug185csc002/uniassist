@@ -24,18 +24,39 @@ import {
   Camera
 } from 'lucide-react';
 
+// Import generated tour images
+import munnarTeaGardens from '@/assets/munnar-tea-gardens.jpg';
+import keralaBackwaters from '@/assets/kerala-backwaters.jpg';
+import athirappillyFalls from '@/assets/athirappilly-falls.jpg';
+import wayanadWildlife from '@/assets/wayanad-wildlife.jpg';
+import kodaikanalHills from '@/assets/kodaikanal-hills.jpg';
+import valparaiHills from '@/assets/valparai-hills.jpg';
+import kochiMarine from '@/assets/kochi-marine.jpg';
+import coorgCoffee from '@/assets/coorg-coffee.jpg';
+
 // Tour images for IV destinations
 const tourImages: Record<string, string> = {
-  'Munnar, Kerala': 'https://images.unsplash.com/photo-1596422846543-75c6fc197825?w=400&h=250&fit=crop',
-  'Thekkady, Kerala': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=250&fit=crop',
-  'Alleppey, Kerala': 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400&h=250&fit=crop',
-  'Coimbatore, Tamil Nadu': 'https://images.unsplash.com/photo-1574086060598-edbb79e6e01e?w=400&h=250&fit=crop',
-  'Chennai, Tamil Nadu': 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400&h=250&fit=crop',
-  'Bangalore, Karnataka': 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?w=400&h=250&fit=crop',
-  'Ooty, Tamil Nadu': 'https://images.unsplash.com/photo-1607004468138-e7e23ea26947?w=400&h=250&fit=crop',
+  'Munnar, Kerala': munnarTeaGardens,
+  'Munnar Tea Gardens': munnarTeaGardens,
+  'Kumarakom, Kerala': keralaBackwaters,
+  'Kumarakom Backwaters': keralaBackwaters,
+  'Athirappilly, Kerala': athirappillyFalls,
+  'Athirappilly Falls': athirappillyFalls,
+  'Wayanad, Kerala': wayanadWildlife,
+  'Wayanad Wildlife Sanctuary': wayanadWildlife,
+  'Kodaikanal, Tamil Nadu': kodaikanalHills,
+  'Valparai, Tamil Nadu': valparaiHills,
+  'Kochi, Kerala': kochiMarine,
+  'Coorg, Karnataka': coorgCoffee,
+  'Thekkady, Kerala': keralaBackwaters,
+  'Alleppey, Kerala': keralaBackwaters,
+  'Coimbatore, Tamil Nadu': valparaiHills,
+  'Chennai, Tamil Nadu': kochiMarine,
+  'Bangalore, Karnataka': coorgCoffee,
+  'Ooty, Tamil Nadu': kodaikanalHills,
 };
 
-const defaultTourImage = 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=250&fit=crop';
+const defaultTourImage = munnarTeaGardens;
 
 // Types for views
 type InternshipAreaData = {

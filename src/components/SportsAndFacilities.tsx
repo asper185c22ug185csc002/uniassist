@@ -33,6 +33,9 @@ import {
   useFacilities,
   useHostelInfo,
 } from "@/hooks/useUniversityData";
+import { AdminEditWrapper } from '@/components/AdminEditWrapper';
+import { useAuth } from '@/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Trophy,
@@ -56,12 +59,21 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export const SportsAndFacilities = () => {
   const [activeTab, setActiveTab] = useState<"sports" | "hostel">("sports");
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch data from database
   const { data: sportsEvents, isLoading: loadingEvents } = useSportsEvents();
   const { data: achievements, isLoading: loadingAchievements } = useAchievements();
   const { data: facilities, isLoading: loadingFacilities } = useFacilities();
   const { data: hostelInfo, isLoading: loadingHostel } = useHostelInfo();
+
+  const refetchData = () => {
+    queryClient.invalidateQueries({ queryKey: ['sports_events'] });
+    queryClient.invalidateQueries({ queryKey: ['achievements'] });
+    queryClient.invalidateQueries({ queryKey: ['facilities'] });
+    queryClient.invalidateQueries({ queryKey: ['hostel_info'] });
+  };
 
   const isLoading = loadingEvents || loadingAchievements || loadingFacilities || loadingHostel;
 
@@ -134,19 +146,32 @@ export const SportsAndFacilities = () => {
               {achievements?.map((achievement, index) => {
                 const IconComponent = iconMap[achievement.icon_name || "Medal"] || Medal;
                 return (
-                  <div
+                  <AdminEditWrapper
                     key={achievement.id}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 animate-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    tableName="achievements"
+                    itemId={achievement.id}
+                    currentData={achievement}
+                    onUpdate={refetchData}
+                    fields={[
+                      { key: 'title', label: 'Title' },
+                      { key: 'description', label: 'Description', type: 'textarea' },
+                      { key: 'year', label: 'Year' },
+                      { key: 'category', label: 'Category' },
+                    ]}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                      <IconComponent className="w-5 h-5 text-yellow-400" />
+                    <div
+                      className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50 border border-slate-700/50 animate-in"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                        <IconComponent className="w-5 h-5 text-yellow-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-slate-200">{achievement.title}</p>
+                        <p className="text-xs text-slate-500">{achievement.year}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-200">{achievement.title}</p>
-                      <p className="text-xs text-slate-500">{achievement.year}</p>
-                    </div>
-                  </div>
+                  </AdminEditWrapper>
                 );
               })}
             </div>
@@ -160,28 +185,43 @@ export const SportsAndFacilities = () => {
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               {sportsEvents?.map((event, index) => (
-                <div
+                <AdminEditWrapper
                   key={event.id}
-                  onClick={() => setSelectedEvent(event)}
-                  className="glass-dark rounded-xl p-5 hover:border-orange-500/30 transition-all cursor-pointer group animate-in"
-                  style={{ animationDelay: `${index * 0.05}s` }}
+                  tableName="sports_events"
+                  itemId={event.id}
+                  currentData={event}
+                  onUpdate={refetchData}
+                  fields={[
+                    { key: 'title', label: 'Title' },
+                    { key: 'category', label: 'Category' },
+                    { key: 'venue', label: 'Venue' },
+                    { key: 'event_date', label: 'Event Date' },
+                    { key: 'description', label: 'Description', type: 'textarea' },
+                    { key: 'status', label: 'Status' },
+                  ]}
                 >
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400">
-                      {event.category}
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      {event.event_date ? new Date(event.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "TBA"}
-                    </span>
+                  <div
+                    onClick={() => setSelectedEvent(event)}
+                    className="glass-dark rounded-xl p-5 hover:border-orange-500/30 transition-all cursor-pointer group animate-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400">
+                        {event.category}
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        {event.event_date ? new Date(event.event_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "TBA"}
+                      </span>
+                    </div>
+                    <h4 className="font-semibold text-slate-100 group-hover:text-orange-400 transition-colors mb-2">
+                      {event.title}
+                    </h4>
+                    <div className="flex items-center gap-2 text-sm text-slate-400">
+                      <MapPin className="w-4 h-4" />
+                      {event.venue}
+                    </div>
                   </div>
-                  <h4 className="font-semibold text-slate-100 group-hover:text-orange-400 transition-colors mb-2">
-                    {event.title}
-                  </h4>
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
-                    <MapPin className="w-4 h-4" />
-                    {event.venue}
-                  </div>
-                </div>
+                </AdminEditWrapper>
               ))}
             </div>
           </div>
@@ -194,17 +234,29 @@ export const SportsAndFacilities = () => {
             </h3>
             <div className="grid md:grid-cols-3 gap-4">
               {sportsFacilities.map((facility, index) => (
-                <div 
+                <AdminEditWrapper
                   key={facility.id}
-                  className="bg-slate-800/50 rounded-xl p-4 animate-in"
-                  style={{ animationDelay: `${index * 0.05}s` }}
+                  tableName="facilities"
+                  itemId={facility.id}
+                  currentData={facility}
+                  onUpdate={refetchData}
+                  fields={[
+                    { key: 'name', label: 'Name' },
+                    { key: 'capacity', label: 'Capacity' },
+                    { key: 'description', label: 'Description', type: 'textarea' },
+                  ]}
                 >
-                  <h4 className="font-medium text-slate-200 mb-2">{facility.name}</h4>
-                  <p className="text-sm text-slate-400">{facility.capacity}</p>
-                  {facility.features && (
-                    <p className="text-xs text-orange-400 mt-1">{facility.features.join(", ")}</p>
-                  )}
-                </div>
+                  <div 
+                    className="bg-slate-800/50 rounded-xl p-4 animate-in"
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
+                    <h4 className="font-medium text-slate-200 mb-2">{facility.name}</h4>
+                    <p className="text-sm text-slate-400">{facility.capacity}</p>
+                    {facility.features && (
+                      <p className="text-xs text-orange-400 mt-1">{facility.features.join(", ")}</p>
+                    )}
+                  </div>
+                </AdminEditWrapper>
               ))}
             </div>
           </div>

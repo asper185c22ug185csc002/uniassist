@@ -34,6 +34,9 @@ import {
   useLibraryCollections,
   useDigitalResources,
 } from "@/hooks/useUniversityData";
+import { AdminEditWrapper } from '@/components/AdminEditWrapper';
+import { useAuth } from '@/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Book,
@@ -115,6 +118,8 @@ export const LibraryCatalog = () => {
   const [activeTab, setActiveTab] = useState<"physical" | "digital" | "collections" | "membership">("digital");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const { isAdmin } = useAuth();
+  const queryClient = useQueryClient();
 
   // Fetch data from database
   const { data: libraryBooks, isLoading: loadingBooks } = useLibraryBooks();
@@ -122,6 +127,12 @@ export const LibraryCatalog = () => {
   const { data: digitalResources, isLoading: loadingResources } = useDigitalResources();
 
   const isLoading = loadingBooks || loadingCollections || loadingResources;
+
+  const refetchData = () => {
+    queryClient.invalidateQueries({ queryKey: ['library_books'] });
+    queryClient.invalidateQueries({ queryKey: ['library_collections'] });
+    queryClient.invalidateQueries({ queryKey: ['digital_resources'] });
+  };
 
   // Get unique categories from books
   const categories = useMemo(() => {
@@ -301,28 +312,41 @@ export const LibraryCatalog = () => {
               {filteredResources.map((resource, index) => {
                 const IconComponent = iconMap[resource.icon_name || "Globe"] || Globe;
                 return (
-                  <a
+                  <AdminEditWrapper
                     key={resource.id}
-                    href={resource.url || "#"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="glass-dark rounded-xl p-4 hover:border-blue-500/30 transition-all group animate-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
+                    tableName="digital_resources"
+                    itemId={resource.id}
+                    currentData={resource}
+                    onUpdate={refetchData}
+                    fields={[
+                      { key: 'title', label: 'Title' },
+                      { key: 'description', label: 'Description', type: 'textarea' },
+                      { key: 'url', label: 'URL' },
+                      { key: 'resource_type', label: 'Resource Type' },
+                    ]}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                        <IconComponent className="w-5 h-5 text-blue-400" />
+                    <a
+                      href={resource.url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass-dark rounded-xl p-4 hover:border-blue-500/30 transition-all group animate-in block"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                          <IconComponent className="w-5 h-5 text-blue-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-slate-200 group-hover:text-blue-400 transition-colors flex items-center gap-1">
+                            {resource.title}
+                            <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </h4>
+                          <p className="text-xs text-slate-400 mt-1 line-clamp-2">{resource.description}</p>
+                          <span className="text-xs text-blue-400 mt-2 inline-block">{resource.resource_type}</span>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-slate-200 group-hover:text-blue-400 transition-colors flex items-center gap-1">
-                          {resource.title}
-                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </h4>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2">{resource.description}</p>
-                        <span className="text-xs text-blue-400 mt-2 inline-block">{resource.resource_type}</span>
-                      </div>
-                    </div>
-                  </a>
+                    </a>
+                  </AdminEditWrapper>
                 );
               })}
             </div>
