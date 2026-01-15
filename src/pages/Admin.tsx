@@ -11,21 +11,26 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter } from 'lucide-react';
+import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter, LayoutDashboard, Settings, Code2 } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
+import { AdminDashboard } from '@/components/admin/AdminDashboard';
+import { TechStackInfo } from '@/components/admin/TechStackInfo';
 
-type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries' | 'industrial_visits';
+type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries' | 'industrial_visits' | 'digital_resources' | 'library_collections' | 'cdoe_programs';
+
+type AdminView = 'dashboard' | 'data' | 'tech';
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, isAdmin, loading, signOut } = useAuth();
   const { toast } = useToast();
+  const [adminView, setAdminView] = useState<AdminView>('dashboard');
   const [activeTable, setActiveTable] = useState<TableName>('news_feed');
   const [data, setData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
 
@@ -43,12 +48,12 @@ const Admin = () => {
   }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && adminView === 'data') {
       fetchData();
       setSearchQuery('');
       setCategoryFilter('all');
     }
-  }, [activeTable, isAdmin]);
+  }, [activeTable, isAdmin, adminView]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -72,22 +77,25 @@ const Admin = () => {
 
   const getTableColumns = (table: TableName): string[] => {
     const columns: Record<TableName, string[]> = {
-      departments: ['name', 'school', 'email', 'phone', 'location'],
-      courses: ['name', 'degree_type', 'duration', 'eligibility', 'total_fee'],
-      news_feed: ['title', 'description', 'category', 'news_date'],
-      library_books: ['title', 'author', 'category', 'isbn', 'location'],
+      departments: ['name', 'school', 'email', 'phone', 'location', 'placements', 'rating'],
+      courses: ['name', 'degree_type', 'duration', 'eligibility', 'total_fee', 'per_year_fee'],
+      news_feed: ['title', 'description', 'category', 'news_date', 'is_active'],
+      library_books: ['title', 'author', 'category', 'isbn', 'location', 'department', 'available'],
       university_info: ['key', 'value', 'category'],
       achievements: ['title', 'description', 'category', 'year', 'icon_name'],
       student_clubs: ['name', 'description', 'members', 'icon_name'],
-      hostel_info: ['location', 'room_capacity', 'total_capacity', 'monthly_rent', 'mess_charges'],
-      facilities: ['name', 'category', 'description', 'capacity'],
+      hostel_info: ['location', 'room_capacity', 'total_capacity', 'monthly_rent', 'mess_charges', 'rating'],
+      facilities: ['name', 'category', 'description', 'capacity', 'icon_name'],
       placement_stats: ['academic_year', 'students_placed', 'companies', 'highest_package', 'average_package'],
       top_recruiters: ['company_name', 'sector'],
-      sports_events: ['title', 'category', 'event_date', 'venue', 'status'],
+      sports_events: ['title', 'category', 'event_date', 'venue', 'status', 'description'],
       alumni: ['name', 'register_number', 'email', 'phone', 'graduation_year', 'department', 'current_job', 'company', 'is_approved'],
       internship_areas: ['department', 'head_of_department', 'email', 'whatsapp_number'],
       inquiries: ['name', 'email', 'subject', 'message', 'status'],
-      industrial_visits: ['title', 'department', 'destination', 'duration', 'visit_date', 'status'],
+      industrial_visits: ['title', 'department', 'destination', 'duration', 'visit_date', 'status', 'coordinator_name'],
+      digital_resources: ['title', 'description', 'resource_type', 'url', 'icon_name'],
+      library_collections: ['department', 'total_books', 'e_books', 'journals', 'theses', 'location'],
+      cdoe_programs: ['name', 'degree_type', 'duration', 'eligibility', 'fee_per_year', 'total_fee'],
     };
     return columns[table] || [];
   };
@@ -104,6 +112,8 @@ const Admin = () => {
       alumni: 'department',
       internship_areas: 'department',
       inquiries: 'status',
+      digital_resources: 'resource_type',
+      industrial_visits: 'status',
     };
     return categoryColumns[table] || null;
   };
@@ -118,7 +128,6 @@ const Admin = () => {
   const filteredData = useMemo(() => {
     let result = data;
     
-    // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(item => 
@@ -128,7 +137,6 @@ const Admin = () => {
       );
     }
     
-    // Apply category filter
     const catCol = getCategoryColumn(activeTable);
     if (categoryFilter !== 'all' && catCol) {
       result = result.filter(item => item[catCol] === categoryFilter);
@@ -207,6 +215,11 @@ const Admin = () => {
     navigate('/');
   };
 
+  const handleNavigateToTable = (table: string) => {
+    setActiveTable(table as TableName);
+    setAdminView('data');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -247,126 +260,173 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <CardTitle>Manage University Data</CardTitle>
-            <Button onClick={handleAdd}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add New
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <Tabs value={activeTable} onValueChange={(v) => setActiveTable(v as TableName)}>
-              <TabsList className="mb-4 flex-wrap h-auto gap-2 justify-start">
-                <TabsTrigger value="news_feed">News</TabsTrigger>
-                <TabsTrigger value="departments">Departments</TabsTrigger>
-                <TabsTrigger value="courses">Courses</TabsTrigger>
-                <TabsTrigger value="library_books">Library</TabsTrigger>
-                <TabsTrigger value="university_info">Info</TabsTrigger>
-                <TabsTrigger value="achievements">Achievements</TabsTrigger>
-                <TabsTrigger value="student_clubs">Clubs</TabsTrigger>
-                <TabsTrigger value="hostel_info">Hostel</TabsTrigger>
-                <TabsTrigger value="facilities">Facilities</TabsTrigger>
-                <TabsTrigger value="placement_stats">Placements</TabsTrigger>
-                <TabsTrigger value="top_recruiters">Recruiters</TabsTrigger>
-                <TabsTrigger value="sports_events">Sports</TabsTrigger>
-                <TabsTrigger value="alumni">Alumni</TabsTrigger>
-                <TabsTrigger value="internship_areas">Internships</TabsTrigger>
-                <TabsTrigger value="industrial_visits">IV</TabsTrigger>
-                <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
-              </TabsList>
+        {/* Main Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <Button
+            variant={adminView === 'dashboard' ? 'default' : 'outline'}
+            onClick={() => setAdminView('dashboard')}
+            className="gap-2"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </Button>
+          <Button
+            variant={adminView === 'data' ? 'default' : 'outline'}
+            onClick={() => setAdminView('data')}
+            className="gap-2"
+          >
+            <Settings className="w-4 h-4" />
+            Manage Data
+          </Button>
+          <Button
+            variant={adminView === 'tech' ? 'default' : 'outline'}
+            onClick={() => setAdminView('tech')}
+            className="gap-2"
+          >
+            <Code2 className="w-4 h-4" />
+            Tech Stack
+          </Button>
+        </div>
 
-              {/* Search and Filter Bar */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                  />
-                </div>
-                {categoryColumn && uniqueCategories.length > 0 && (
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="w-full sm:w-48">
-                      <Filter className="w-4 h-4 mr-2" />
-                      <SelectValue placeholder="Filter by category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {uniqueCategories.map(cat => (
-                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+        {/* Dashboard View */}
+        {adminView === 'dashboard' && (
+          <AdminDashboard onNavigateToTable={handleNavigateToTable} />
+        )}
 
-              <TabsContent value={activeTable}>
-                {isLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        {/* Tech Stack View */}
+        {adminView === 'tech' && (
+          <TechStackInfo />
+        )}
+
+        {/* Data Management View */}
+        {adminView === 'data' && (
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <CardTitle>Manage University Data</CardTitle>
+              <Button onClick={handleAdd}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add New
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activeTable} onValueChange={(v) => setActiveTable(v as TableName)}>
+                <TabsList className="mb-4 flex-wrap h-auto gap-2 justify-start">
+                  <TabsTrigger value="news_feed">News</TabsTrigger>
+                  <TabsTrigger value="departments">Departments</TabsTrigger>
+                  <TabsTrigger value="courses">Courses</TabsTrigger>
+                  <TabsTrigger value="library_books">Library</TabsTrigger>
+                  <TabsTrigger value="library_collections">Collections</TabsTrigger>
+                  <TabsTrigger value="digital_resources">E-Resources</TabsTrigger>
+                  <TabsTrigger value="university_info">Info</TabsTrigger>
+                  <TabsTrigger value="achievements">Achievements</TabsTrigger>
+                  <TabsTrigger value="student_clubs">Clubs</TabsTrigger>
+                  <TabsTrigger value="hostel_info">Hostel</TabsTrigger>
+                  <TabsTrigger value="facilities">Facilities</TabsTrigger>
+                  <TabsTrigger value="placement_stats">Placements</TabsTrigger>
+                  <TabsTrigger value="top_recruiters">Recruiters</TabsTrigger>
+                  <TabsTrigger value="sports_events">Sports</TabsTrigger>
+                  <TabsTrigger value="alumni">Alumni</TabsTrigger>
+                  <TabsTrigger value="internship_areas">Internships</TabsTrigger>
+                  <TabsTrigger value="industrial_visits">IV</TabsTrigger>
+                  <TabsTrigger value="cdoe_programs">CDOE</TabsTrigger>
+                  <TabsTrigger value="inquiries">Inquiries</TabsTrigger>
+                </TabsList>
+
+                {/* Search and Filter Bar */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9"
+                    />
                   </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          {columns.map(col => (
-                            <TableHead key={col} className="capitalize whitespace-nowrap">
-                              {col.replace(/_/g, ' ')}
-                            </TableHead>
-                          ))}
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredData.map((item) => (
-                          <TableRow key={item.id}>
-                            {columns.map(col => (
-                              <TableCell key={col} className="max-w-[200px] truncate">
-                                {item[col] || '-'}
-                              </TableCell>
-                            ))}
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(item)}
-                                >
-                                  <Pencil className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(item.id)}
-                                >
-                                  <Trash2 className="w-4 h-4 text-destructive" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
+                  {categoryColumn && uniqueCategories.length > 0 && (
+                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                      <SelectTrigger className="w-full sm:w-48">
+                        <Filter className="w-4 h-4 mr-2" />
+                        <SelectValue placeholder="Filter by category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {uniqueCategories.map(cat => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                         ))}
-                        {filteredData.length === 0 && (
-                          <TableRow>
-                            <TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">
-                              {searchQuery || categoryFilter !== 'all' ? 'No matching results' : 'No data found'}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                    <div className="mt-2 text-sm text-muted-foreground">
-                      Showing {filteredData.length} of {data.length} items
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+
+                <TabsContent value={activeTable}>
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     </div>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            {columns.map(col => (
+                              <TableHead key={col} className="capitalize whitespace-nowrap">
+                                {col.replace(/_/g, ' ')}
+                              </TableHead>
+                            ))}
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredData.map((item) => (
+                            <TableRow key={item.id}>
+                              {columns.map(col => (
+                                <TableCell key={col} className="max-w-[200px] truncate">
+                                  {typeof item[col] === 'boolean' 
+                                    ? (item[col] ? '✓' : '✗')
+                                    : (item[col] || '-')
+                                  }
+                                </TableCell>
+                              ))}
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEdit(item)}
+                                  >
+                                    <Pencil className="w-4 h-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleDelete(item.id)}
+                                  >
+                                    <Trash2 className="w-4 h-4 text-destructive" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {filteredData.length === 0 && (
+                            <TableRow>
+                              <TableCell colSpan={columns.length + 1} className="text-center py-8 text-muted-foreground">
+                                {searchQuery || categoryFilter !== 'all' ? 'No matching results' : 'No data found'}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                      <div className="mt-2 text-sm text-muted-foreground">
+                        Showing {filteredData.length} of {data.length} items
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Edit/Add Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -382,12 +442,42 @@ const Admin = () => {
                   <label className="text-sm font-medium capitalize">
                     {col.replace(/_/g, ' ')}
                   </label>
-                  {col === 'description' || col === 'value' ? (
+                  {col === 'description' || col === 'value' || col === 'message' ? (
                     <Textarea
                       value={formData[col] || ''}
                       onChange={(e) => setFormData({ ...formData, [col]: e.target.value })}
                       rows={3}
                     />
+                  ) : col === 'is_active' || col === 'is_approved' || col === 'available' ? (
+                    <Select
+                      value={String(formData[col] ?? 'true')}
+                      onValueChange={(v) => setFormData({ ...formData, [col]: v === 'true' })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">Yes</SelectItem>
+                        <SelectItem value="false">No</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : col === 'status' ? (
+                    <Select
+                      value={formData[col] || ''}
+                      onValueChange={(v) => setFormData({ ...formData, [col]: v })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="upcoming">Upcoming</SelectItem>
+                        <SelectItem value="ongoing">Ongoing</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <Input
                       value={formData[col] || ''}
