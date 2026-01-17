@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Sparkles, Coins, GraduationCap, Library, Home, History, Download, Plus, Edit3 } from "lucide-react";
+import { Send, Bot, User, Loader2, Sparkles, Coins, GraduationCap, Library, Home, History, Download, Plus, Edit3, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -436,6 +436,26 @@ export const ChatInterface = () => {
                   View {sessions.length} saved conversation{sessions.length > 1 ? "s" : ""}
                 </button>
               )}
+
+              {/* Features Info */}
+              <div className="mt-8 pt-6 border-t border-slate-800/50 w-full max-w-2xl px-4">
+                <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
+                  <Info className="w-4 h-4" />
+                  <span>UniAssist Features</span>
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {["AI Chat Assistant", "28+ Departments", "Library Catalog", "E-Resources Portal", "Sports & Hostel Info", "Alumni Network", "Placement Stats", "Admin Management"].map((feature) => (
+                    <span key={feature} className="text-xs px-3 py-1 rounded-full bg-slate-800/50 text-slate-400 border border-slate-700/50">
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+                {isAdmin && (
+                  <p className="text-xs text-orange-400 text-center mt-3">
+                    🔧 Admin Mode: You can edit content directly on pages or use /admin command
+                  </p>
+                )}
+              </div>
             </div>
           ) : (
             /* Chat Messages */
