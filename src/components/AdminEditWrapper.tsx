@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Save, X } from 'lucide-react';
+import { Pencil, Save, X, Edit3 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface EditableFieldConfig {
   key: string;
@@ -66,21 +67,33 @@ export const AdminEditWrapper = ({
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group admin-editable">
       {children}
       
-      {/* Edit Button - shows on hover for admin */}
-      <Button
-        variant="secondary"
-        size="icon"
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 h-8 w-8"
-        onClick={() => {
-          setFormData(currentData);
-          setIsEditing(true);
-        }}
-      >
-        <Pencil className="w-4 h-4" />
-      </Button>
+      {/* Always visible edit indicator for admin */}
+      <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+        {/* Subtle always-visible indicator */}
+        <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-orange-500/10 border border-orange-500/20 opacity-60 group-hover:opacity-100 transition-all">
+          <Edit3 className="w-3 h-3 text-orange-400" />
+          <span className="text-[10px] font-medium text-orange-400 hidden group-hover:inline">Editable</span>
+        </div>
+        
+        {/* Edit Button - more prominent on hover */}
+        <Button
+          variant="secondary"
+          size="icon"
+          className={cn(
+            "h-7 w-7 bg-orange-500/20 hover:bg-orange-500/40 border border-orange-500/30",
+            "opacity-40 group-hover:opacity-100 transition-all"
+          )}
+          onClick={() => {
+            setFormData(currentData);
+            setIsEditing(true);
+          }}
+        >
+          <Pencil className="w-3.5 h-3.5 text-orange-400" />
+        </Button>
+      </div>
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
@@ -201,11 +214,16 @@ export const InlineEdit = ({
 
   return (
     <span 
-      className={`${className} cursor-pointer hover:bg-primary/10 px-1 rounded`}
+      className={cn(
+        className,
+        "cursor-pointer hover:bg-orange-500/10 px-1 rounded relative group inline-flex items-center gap-1",
+        "border border-transparent hover:border-orange-500/20 transition-all"
+      )}
       onClick={() => setIsEditing(true)}
       title="Click to edit"
     >
       {value}
+      <Edit3 className="w-3 h-3 text-orange-400 opacity-40 group-hover:opacity-100 transition-opacity" />
     </span>
   );
 };

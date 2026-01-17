@@ -11,14 +11,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter, LayoutDashboard, Settings, Code2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter, LayoutDashboard, Settings, Code2, FileText } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { TechStackInfo } from '@/components/admin/TechStackInfo';
+import { FeaturesDocumentation } from '@/components/admin/FeaturesDocumentation';
 
 type TableName = 'departments' | 'courses' | 'news_feed' | 'library_books' | 'university_info' | 'achievements' | 'student_clubs' | 'hostel_info' | 'facilities' | 'placement_stats' | 'top_recruiters' | 'sports_events' | 'alumni' | 'internship_areas' | 'inquiries' | 'industrial_visits' | 'digital_resources' | 'library_collections' | 'cdoe_programs';
 
-type AdminView = 'dashboard' | 'data' | 'tech';
+type AdminView = 'dashboard' | 'data' | 'tech' | 'features';
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -286,6 +287,14 @@ const Admin = () => {
             <Code2 className="w-4 h-4" />
             Tech Stack
           </Button>
+          <Button
+            variant={adminView === 'features' ? 'default' : 'outline'}
+            onClick={() => setAdminView('features')}
+            className="gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            Features & Docs
+          </Button>
         </div>
 
         {/* Dashboard View */}
@@ -296,6 +305,11 @@ const Admin = () => {
         {/* Tech Stack View */}
         {adminView === 'tech' && (
           <TechStackInfo />
+        )}
+
+        {/* Features Documentation View */}
+        {adminView === 'features' && (
+          <FeaturesDocumentation />
         )}
 
         {/* Data Management View */}
