@@ -44,26 +44,10 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-
+  
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, signIn, signUp } = useAuth();
-
-  const getPasswordStrength = (pwd: string) => {
-    const checks = [
-      pwd.length >= 8,
-      /[a-z]/.test(pwd),
-      /[A-Z]/.test(pwd),
-      /[0-9]/.test(pwd),
-      /[^a-zA-Z0-9]/.test(pwd),
-    ];
-    const score = checks.filter(Boolean).length;
-
-    if (!pwd) return { label: 'Weak', level: 0 as const, score };
-    if (score <= 2) return { label: 'Weak', level: 1 as const, score };
-    if (score <= 4) return { label: 'Medium', level: 2 as const, score };
-    return { label: 'Strong', level: 3 as const, score };
-  };
 
   useEffect(() => {
     if (user) {
@@ -373,61 +357,33 @@ const Auth = () => {
                   )}
                   
                   {/* Password requirements for signup */}
-                  {mode === 'signup' && (() => {
-                    const strength = getPasswordStrength(password);
-                    const activeColor =
-                      strength.level === 1
-                        ? 'bg-destructive'
-                        : strength.level === 2
-                          ? 'bg-secondary'
-                          : 'bg-primary';
-
-                    return (
-                      <div className="space-y-3 text-xs">
-                        {/* Strength meter */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-muted-foreground font-medium">Password strength</p>
-                            <p className="text-muted-foreground">{strength.label}</p>
-                          </div>
-                          <div className="grid grid-cols-3 gap-1" aria-label={`Password strength: ${strength.label}`}>
-                            {[1, 2, 3].map((i) => (
-                              <div
-                                key={i}
-                                className={`h-2 rounded-full bg-muted ${strength.level >= i ? activeColor : ''}`}
-                              />
-                            ))}
-                          </div>
+                  {mode === 'signup' && (
+                    <div className="space-y-1 text-xs">
+                      <p className="text-muted-foreground font-medium">Password must contain:</p>
+                      <div className="grid grid-cols-2 gap-1">
+                        <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {password.length >= 8 ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          At least 8 characters
                         </div>
-
-                        <div className="space-y-1">
-                          <p className="text-muted-foreground font-medium">Password must contain:</p>
-                          <div className="grid grid-cols-2 gap-1">
-                            <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-500' : 'text-muted-foreground'}`}>
-                              {password.length >= 8 ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                              At least 8 characters
-                            </div>
-                            <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                              {/[a-z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                              Lowercase letter
-                            </div>
-                            <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                              {/[A-Z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                              Uppercase letter
-                            </div>
-                            <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                              {/[0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                              Number
-                            </div>
-                            <div className={`flex items-center gap-1 ${/[^a-zA-Z0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                              {/[^a-zA-Z0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                              Special character
-                            </div>
-                          </div>
+                        <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {/[a-z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          Lowercase letter
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {/[A-Z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          Uppercase letter
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {/[0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          Number
+                        </div>
+                        <div className={`flex items-center gap-1 ${/[^a-zA-Z0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
+                          {/[^a-zA-Z0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                          Special character
                         </div>
                       </div>
-                    );
-                  })()}
+                    </div>
+                  )}
                 </div>
                 
                 {mode === 'login' && (

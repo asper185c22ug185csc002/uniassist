@@ -14,41 +14,30 @@ import Internships from "./pages/Internships";
 import Alumni from "./pages/Alumni";
 import NotFound from "./pages/NotFound";
 import FloatingAIButton from "./components/FloatingAIButton";
-import { AuthProvider } from "@/hooks/useAuth";
 
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/academics" element={<Academics />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/sports" element={<Sports />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/internships" element={<Internships />} />
-            <Route path="/alumni" element={<Alumni />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <FloatingAIButton />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/academics" element={<Academics />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/sports" element={<Sports />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/internships" element={<Internships />} />
+          <Route path="/alumni" element={<Alumni />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <FloatingAIButton />
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
