@@ -1,84 +1,78 @@
-import { useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { useEffect, useMemo, useState } from 'react';
+import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(false);
 
+  // 1) Auth session lifecycle (MUST be sync-only inside onAuthStateChange)
   useEffect(() => {
     let isMounted = true;
-    let subscription: { unsubscribe: () => void } | null = null;
 
-    const initializeAuth = async () => {
-      try {
-        // Get the current session first
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!isMounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await checkAdminRole(session.user.id);
-        }
-        
-        if (isMounted) {
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!isMounted) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setAuthLoading(false);
+    });
 
-    // Set up auth state listener
-    const { data } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!isMounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await checkAdminRole(session.user.id);
-        } else {
-          setIsAdmin(false);
-        }
-        
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    );
-    
-    subscription = data.subscription;
-
-    initializeAuth();
+    // After listener is set, fetch existing session
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      if (!isMounted) return;
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
+      setAuthLoading(false);
+    }).catch((error) => {
+      // Avoid leaking sensitive details; log minimal info
+      console.error('Auth getSession failed');
+      if (isMounted) setAuthLoading(false);
+    });
 
     return () => {
       isMounted = false;
-      if (subscription) {
-        subscription.unsubscribe();
-      }
+      subscription?.unsubscribe();
     };
   }, []);
 
-  const checkAdminRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .eq('role', 'admin')
-      .maybeSingle();
-    
-    setIsAdmin(!!data && !error);
-  };
+  // 2) Role check happens OUTSIDE the auth callback to avoid deadlocks
+  useEffect(() => {
+    let cancelled = false;
+
+    const run = async () => {
+      if (!user?.id) {
+        setIsAdmin(false);
+        return;
+      }
+
+      setRoleLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+
+        if (!cancelled) setIsAdmin(!!data && !error);
+      } catch {
+        if (!cancelled) setIsAdmin(false);
+      } finally {
+        if (!cancelled) setRoleLoading(false);
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  const loading = useMemo(() => authLoading || roleLoading, [authLoading, roleLoading]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -90,14 +84,15 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
-      }
+        emailRedirectTo: redirectUrl,
+      },
     });
+
     return { error };
   };
 
@@ -117,3 +112,4 @@ export const useAuth = () => {
     signOut,
   };
 };
+
