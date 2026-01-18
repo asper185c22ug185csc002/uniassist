@@ -10,27 +10,35 @@ export const useAuth = () => {
 
   useEffect(() => {
     let isMounted = true;
+    let subscription: { unsubscribe: () => void } | null = null;
 
     const initializeAuth = async () => {
-      // Get the current session first
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!isMounted) return;
-      
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await checkAdminRole(session.user.id);
-      }
-      
-      if (isMounted) {
-        setLoading(false);
+      try {
+        // Get the current session first
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!isMounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await checkAdminRole(session.user.id);
+        }
+        
+        if (isMounted) {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
         
@@ -48,12 +56,16 @@ export const useAuth = () => {
         }
       }
     );
+    
+    subscription = data.subscription;
 
     initializeAuth();
 
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 
