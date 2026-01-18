@@ -89,6 +89,9 @@ interface InquirySubmission {
   created_at: string;
 }
 
+const INQUIRY_COOLDOWN_MS = 60000; // 1 minute cooldown between submissions
+const INQUIRY_STORAGE_KEY = "inquiry_last_submit";
+
 export const ContactDirectory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -100,6 +103,14 @@ export const ContactDirectory = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState<number>(() => {
+    try {
+      const stored = localStorage.getItem(INQUIRY_STORAGE_KEY);
+      return stored ? parseInt(stored, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
 
   // Fetch departments from database
   const { data: dbDepartments, isLoading } = useDepartments();
@@ -128,6 +139,14 @@ export const ContactDirectory = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Rate limiting check
+    const now = Date.now();
+    const timeLeft = INQUIRY_COOLDOWN_MS - (now - lastSubmitTime);
+    if (timeLeft > 0) {
+      toast.error(`Please wait ${Math.ceil(timeLeft / 1000)} seconds before submitting another inquiry`);
+      return;
+    }
     
     // Validate input with Zod
     const validation = inquirySchema.safeParse(formData);
@@ -151,6 +170,15 @@ export const ContactDirectory = () => {
       }]);
 
       if (error) throw error;
+
+      // Update rate limiting timestamp
+      const submitTime = Date.now();
+      setLastSubmitTime(submitTime);
+      try {
+        localStorage.setItem(INQUIRY_STORAGE_KEY, String(submitTime));
+      } catch {
+        // Ignore localStorage errors
+      }
 
       toast.success("Inquiry submitted successfully! We will get back to you soon.");
       setFormData({ name: "", email: "", subject: "", message: "" });
