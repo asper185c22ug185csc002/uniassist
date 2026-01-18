@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter, LayoutDashboard, Settings, Code2, FileText, RefreshCw, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { Plus, Pencil, Trash2, LogOut, ArrowLeft, Loader2, Search, Filter, LayoutDashboard, Settings, Code2, FileText } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { TechStackInfo } from '@/components/admin/TechStackInfo';
@@ -23,7 +23,7 @@ type AdminView = 'dashboard' | 'data' | 'tech' | 'features';
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { user, isAdmin, loading, adminCheckError, retryAdminCheck, signOut } = useAuth();
+  const { user, isAdmin, loading, signOut } = useAuth();
   const { toast } = useToast();
   const [adminView, setAdminView] = useState<AdminView>('dashboard');
   const [activeTable, setActiveTable] = useState<TableName>('news_feed');
@@ -34,15 +34,19 @@ const Admin = () => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [showAccessDenied, setShowAccessDenied] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
-    } else if (!loading && user && !isAdmin && !adminCheckError) {
-      setShowAccessDenied(true);
+    } else if (!loading && user && !isAdmin) {
+      toast({
+        title: 'Access Denied',
+        description: 'You need admin privileges to access this page.',
+        variant: 'destructive',
+      });
+      navigate('/');
     }
-  }, [user, isAdmin, loading, adminCheckError, navigate]);
+  }, [user, isAdmin, loading, navigate]);
 
   useEffect(() => {
     if (isAdmin && adminView === 'data') {
@@ -220,78 +224,12 @@ const Admin = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Verifying admin access...</p>
-        </div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  // Show error with retry option
-  if (adminCheckError) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertTriangle className="w-8 h-8 text-destructive" />
-            </div>
-            <CardTitle>Connection Error</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-center text-muted-foreground">{adminCheckError}</p>
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => navigate('/')}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back
-              </Button>
-              <Button className="flex-1" onClick={retryAdminCheck}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Retry
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Show access denied with helpful message
-  if (showAccessDenied || !isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-orange-500/10 flex items-center justify-center mb-4">
-              <ShieldAlert className="w-8 h-8 text-orange-500" />
-            </div>
-            <CardTitle>Access Denied</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-center text-muted-foreground">
-              You need admin privileges to access this page. If you believe this is an error, please try the following:
-            </p>
-            <ul className="text-sm text-muted-foreground space-y-2 list-disc list-inside">
-              <li>Make sure you're logged in with an admin account</li>
-              <li>Try signing out and signing back in</li>
-              <li>Contact the system administrator</li>
-            </ul>
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={() => navigate('/')}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Home
-              </Button>
-              <Button className="flex-1" onClick={retryAdminCheck}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Retry Check
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  if (!isAdmin) return null;
 
   const columns = getTableColumns(activeTable);
   const categoryColumn = getCategoryColumn(activeTable);

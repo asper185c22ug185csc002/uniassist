@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -7,7 +7,6 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [adminCheckError, setAdminCheckError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -58,38 +57,16 @@ export const useAuth = () => {
     };
   }, []);
 
-  const checkAdminRole = useCallback(async (userId: string) => {
-    setAdminCheckError(null);
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
-      
-      if (error) {
-        setAdminCheckError('Failed to verify admin status. Please check your connection.');
-        setIsAdmin(false);
-        return false;
-      }
-      
-      setIsAdmin(!!data);
-      return !!data;
-    } catch (err) {
-      setAdminCheckError('Network error while checking admin status.');
-      setIsAdmin(false);
-      return false;
-    }
-  }, []);
-
-  const retryAdminCheck = useCallback(async () => {
-    if (user) {
-      setLoading(true);
-      await checkAdminRole(user.id);
-      setLoading(false);
-    }
-  }, [user, checkAdminRole]);
+  const checkAdminRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .eq('role', 'admin')
+      .maybeSingle();
+    
+    setIsAdmin(!!data && !error);
+  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -123,8 +100,6 @@ export const useAuth = () => {
     session,
     isAdmin,
     loading,
-    adminCheckError,
-    retryAdminCheck,
     signIn,
     signUp,
     signOut,

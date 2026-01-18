@@ -8,21 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Mail, Lock, KeyRound, ShieldCheck, User, GraduationCap, Users, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, KeyRound, ShieldCheck, User, GraduationCap, Users } from 'lucide-react';
 import periyarLogo from '@/assets/periyar-logo.jpg';
 
 const emailSchema = z.string().email('Please enter a valid email address');
-
-// Strong password validation
-const passwordSchema = z.string()
-  .min(8, 'Password must be at least 8 characters')
-  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-  .regex(/[0-9]/, 'Password must contain at least one number')
-  .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character (!@#$%^&*)');
-
-// Simpler validation for login (don't enforce rules on existing passwords)
-const loginPasswordSchema = z.string().min(1, 'Password is required');
+const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
 type AuthMode = 'login' | 'signup' | 'forgot-password';
 type UserRole = 'admin' | 'student' | 'alumni' | 'user';
@@ -73,9 +63,7 @@ const Auth = () => {
     }
     
     if (checkPassword) {
-      // Use stricter validation for signup, simpler for login
-      const schema = mode === 'signup' ? passwordSchema : loginPasswordSchema;
-      const passwordResult = schema.safeParse(password);
+      const passwordResult = passwordSchema.safeParse(password);
       if (!passwordResult.success) {
         newErrors.password = passwordResult.error.errors[0].message;
       }
@@ -354,35 +342,6 @@ const Auth = () => {
                   </div>
                   {errors.password && (
                     <p className="text-sm text-destructive">{errors.password}</p>
-                  )}
-                  
-                  {/* Password requirements for signup */}
-                  {mode === 'signup' && (
-                    <div className="space-y-1 text-xs">
-                      <p className="text-muted-foreground font-medium">Password must contain:</p>
-                      <div className="grid grid-cols-2 gap-1">
-                        <div className={`flex items-center gap-1 ${password.length >= 8 ? 'text-green-500' : 'text-muted-foreground'}`}>
-                          {password.length >= 8 ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          At least 8 characters
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[a-z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                          {/[a-z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          Lowercase letter
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[A-Z]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                          {/[A-Z]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          Uppercase letter
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                          {/[0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          Number
-                        </div>
-                        <div className={`flex items-center gap-1 ${/[^a-zA-Z0-9]/.test(password) ? 'text-green-500' : 'text-muted-foreground'}`}>
-                          {/[^a-zA-Z0-9]/.test(password) ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
-                          Special character
-                        </div>
-                      </div>
-                    </div>
                   )}
                 </div>
                 
