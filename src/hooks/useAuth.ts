@@ -14,17 +14,25 @@ export const useAuth = () => {
 
     const initializeAuth = async () => {
       // Get the current session first
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
+      // If the stored refresh token is invalid/corrupted, clear it so sign-in works again.
+      if (error?.message?.includes('Refresh Token Not Found')) {
+        await supabase.auth.signOut();
+      }
+
       if (!isMounted) return;
-      
+
       setSession(session);
       setUser(session?.user ?? null);
-      
+
       if (session?.user) {
         await checkAdminRole(session.user.id);
       }
-      
+
       if (isMounted) {
         setLoading(false);
       }
