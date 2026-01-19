@@ -16,7 +16,19 @@ export const useAuth = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!isMounted) return;
       setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+      const nextUser = nextSession?.user ?? null;
+      setUser(nextUser);
+
+      // Important: avoid a render where user is set but role check hasn't started yet.
+      // If a user exists, mark role as loading immediately so protected routes don't misfire.
+      if (nextUser?.id) {
+        setRoleLoading(true);
+        setIsAdmin(false);
+      } else {
+        setRoleLoading(false);
+        setIsAdmin(false);
+      }
+
       setAuthLoading(false);
     });
 
@@ -24,12 +36,26 @@ export const useAuth = () => {
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       if (!isMounted) return;
       setSession(existingSession);
-      setUser(existingSession?.user ?? null);
+      const existingUser = existingSession?.user ?? null;
+      setUser(existingUser);
+
+      if (existingUser?.id) {
+        setRoleLoading(true);
+        setIsAdmin(false);
+      } else {
+        setRoleLoading(false);
+        setIsAdmin(false);
+      }
+
       setAuthLoading(false);
     }).catch((error) => {
       // Avoid leaking sensitive details; log minimal info
       console.error('Auth getSession failed');
-      if (isMounted) setAuthLoading(false);
+      if (isMounted) {
+        setAuthLoading(false);
+        setRoleLoading(false);
+        setIsAdmin(false);
+      }
     });
 
     return () => {
@@ -45,19 +71,18 @@ export const useAuth = () => {
     const run = async () => {
       if (!user?.id) {
         setIsAdmin(false);
+        setRoleLoading(false);
         return;
       }
 
-      setRoleLoading(true);
+      // roleLoading is set to true as soon as a user is detected (see auth effect)
       try {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
+        const { data, error } = await supabase.rpc('has_role', {
+          _user_id: user.id,
+          _role: 'admin',
+        });
 
-        if (!cancelled) setIsAdmin(!!data && !error);
+        if (!cancelled) setIsAdmin(!error && data === true);
       } catch {
         if (!cancelled) setIsAdmin(false);
       } finally {
