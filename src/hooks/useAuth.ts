@@ -82,8 +82,11 @@ export const useAuth = () => {
           _role: 'admin',
         });
 
+        console.log('[useAuth] has_role result:', { data, error, userId: user.id });
+
         if (!cancelled) setIsAdmin(!error && data === true);
-      } catch {
+      } catch (e) {
+        console.error('[useAuth] has_role exception:', e);
         if (!cancelled) setIsAdmin(false);
       } finally {
         if (!cancelled) setRoleLoading(false);
