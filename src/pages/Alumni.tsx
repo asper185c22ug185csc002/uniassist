@@ -596,11 +596,15 @@ const Alumni = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-8">
-          <Button onClick={() => setShowLoginDialog(true)} variant="outline" size="lg">
+          <Button 
+            onClick={() => setShowLoginDialog(true)} 
+            size="lg"
+            className="bg-amber-600 hover:bg-amber-700 text-white border-amber-500 shadow-lg shadow-amber-600/20"
+          >
             <LogIn className="w-5 h-5 mr-2" />
             Alumni Login
           </Button>
-          <Button onClick={() => setShowRegisterDialog(true)} size="lg">
+          <Button onClick={() => setShowRegisterDialog(true)} variant="outline" size="lg">
             <UserPlus className="w-5 h-5 mr-2" />
             Register as Alumni
           </Button>
