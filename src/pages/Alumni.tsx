@@ -604,7 +604,11 @@ const Alumni = () => {
             <LogIn className="w-5 h-5 mr-2" />
             Alumni Login
           </Button>
-          <Button onClick={() => setShowRegisterDialog(true)} variant="outline" size="lg">
+          <Button 
+            onClick={() => setShowRegisterDialog(true)} 
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-lg shadow-blue-600/20"
+          >
             <UserPlus className="w-5 h-5 mr-2" />
             Register as Alumni
           </Button>
