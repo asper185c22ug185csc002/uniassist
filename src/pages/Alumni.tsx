@@ -638,20 +638,33 @@ const Alumni = () => {
           </Card>
         </div>
 
+        {/* Admin Section - Highly Visible */}
+        {isAdmin && (
+          <div className="mb-8 p-4 bg-orange-500/10 border-2 border-orange-500/50 rounded-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <Shield className="w-6 h-6 text-orange-500" />
+              <h2 className="text-xl font-bold text-orange-500">Admin Dashboard - Alumni Management</h2>
+            </div>
+            <p className="text-sm text-orange-400/80 mb-4">
+              You have admin privileges. Manage alumni registrations, approve pending requests, and edit records.
+            </p>
+          </div>
+        )}
+
         {/* Admin Tabs */}
         {isAdmin ? (
           <>
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
-                <TabsTrigger value="approved" className="flex gap-2">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 bg-orange-500/10 border border-orange-500/30">
+                <TabsTrigger value="approved" className="flex gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   <Check className="w-4 h-4" />
                   Approved ({alumni?.length || 0})
                 </TabsTrigger>
-                <TabsTrigger value="pending" className="flex gap-2">
+                <TabsTrigger value="pending" className="flex gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   <Clock className="w-4 h-4" />
                   Pending ({pendingAlumni?.length || 0})
                 </TabsTrigger>
-                <TabsTrigger value="all" className="flex gap-2">
+                <TabsTrigger value="all" className="flex gap-2 data-[state=active]:bg-orange-500 data-[state=active]:text-white">
                   <Users className="w-4 h-4" />
                   All ({allAlumni?.length || 0})
                 </TabsTrigger>
