@@ -8,27 +8,31 @@
     <link rel="preconnect" href="https://jimapgsfkflantwkkryu.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://jimapgsfkflantwkkryu.supabase.co" />
     
-    <!-- Critical CSS inlined for FCP -->
+    <!-- Critical CSS inlined for fastest FCP -->
     <style>
       *{margin:0;padding:0;box-sizing:border-box}
-      html{font-family:system-ui,-apple-system,sans-serif;-webkit-text-size-adjust:100%}
-      body{min-height:100vh;background:#020617}
+      html{font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-text-size-adjust:100%}
+      body{min-height:100vh;background:#020617;color:#e2e8f0}
       #root{min-height:100vh}
-      .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#020617}
-      .loading-spinner{width:2rem;height:2rem;border:2px solid #334155;border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite}
+      .loading-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#020617;flex-direction:column;gap:1rem}
+      .loading-spinner{width:2rem;height:2rem;border:2px solid #334155;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite}
+      .loading-text{color:#64748b;font-size:0.875rem}
       @keyframes spin{to{transform:rotate(360deg)}}
     </style>
     
     <link rel="icon" type="image/jpeg" href="/favicon.jpg" />
     <title>Periyar University - AI Campus Assistant</title>
-    <meta name="description" content="Periyar University AI-powered campus assistant for students and faculty" />
+    <meta name="description" content="Periyar University AI-powered campus assistant for students and faculty. Get instant answers about admissions, academics, library services, and campus facilities." />
     <meta name="author" content="Periyar University" />
-
+    <meta name="theme-color" content="#020617" />
+    
+    <!-- Open Graph -->
     <meta property="og:title" content="Periyar University - AI Campus Assistant" />
     <meta property="og:description" content="Periyar University AI-powered campus assistant for students and faculty" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/favicon.jpg" />
-
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@PeriyarUniv" />
     <meta name="twitter:image" content="/favicon.jpg" />
@@ -36,7 +40,10 @@
 
   <body>
     <div id="root">
-      <div class="loading-screen"><div class="loading-spinner"></div></div>
+      <div class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading UniAssist AI...</p>
+      </div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

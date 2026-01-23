@@ -1,35 +1,29 @@
-import { ReactNode } from "react";
-import { AppSidebar } from "./AppSidebar";
+import { ReactNode, lazy, Suspense, memo } from "react";
 import { MobileNav } from "./MobileNav";
-import periyarLogo from "@/assets/periyar-logo.jpg";
+
+// Lazy load the sidebar to reduce initial bundle
+const AppSidebar = lazy(() => import("./AppSidebar"));
+
+// Memoized sidebar fallback - minimal skeleton
+const SidebarFallback = () => (
+  <aside className="fixed left-0 top-0 h-screen z-40 w-64 bg-slate-900/95 backdrop-blur-xl border-r border-slate-800/50" />
+);
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-export const Layout = ({ children }: LayoutProps) => {
+// Memoize Layout to prevent unnecessary re-renders
+export const Layout = memo(({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Dynamic Background */}
+      {/* Minimal Background - CSS only, no images */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {/* Gradient Blurs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" style={{ animationDelay: "2s" }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-slate-800/20 rounded-full blur-3xl" />
+        {/* CSS-only gradient orbs - no JavaScript animation on critical path */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" />
         
-        {/* Watermark Logo - CSS background to avoid LCP impact */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.02]"
-          style={{ 
-            backgroundImage: `url(${periyarLogo})`,
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'center'
-          }}
-          aria-hidden="true"
-        />
-        
-        {/* Grid Pattern */}
+        {/* Grid Pattern - pure CSS */}
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -42,9 +36,11 @@ export const Layout = ({ children }: LayoutProps) => {
         />
       </div>
 
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - lazy loaded */}
       <div className="hidden md:block">
-        <AppSidebar />
+        <Suspense fallback={<SidebarFallback />}>
+          <AppSidebar />
+        </Suspense>
       </div>
 
       {/* Main Content */}
@@ -56,6 +52,8 @@ export const Layout = ({ children }: LayoutProps) => {
       <MobileNav />
     </div>
   );
-};
+});
+
+Layout.displayName = 'Layout';
 
 export default Layout;

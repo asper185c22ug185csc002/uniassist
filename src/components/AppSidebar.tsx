@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   HelpCircle,
@@ -13,11 +13,11 @@ import {
   Shield,
   Users,
   Briefcase,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import periyarLogo from "@/assets/periyar-logo.jpg";
 
 const menuItems = [
   {
@@ -64,7 +64,49 @@ const menuItems = [
   },
 ];
 
-export const AppSidebar = () => {
+// Memoized menu item for performance
+const MenuItem = memo(({ item, isActive, collapsed }: { 
+  item: typeof menuItems[0]; 
+  isActive: boolean; 
+  collapsed: boolean;
+}) => (
+  <NavLink
+    to={item.path}
+    className={cn(
+      "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
+      "hover:bg-slate-800/60 group",
+      isActive
+        ? "bg-gradient-to-r from-blue-500/20 to-blue-600/10 border border-blue-500/30 text-blue-400"
+        : "text-slate-400 hover:text-slate-200"
+    )}
+  >
+    <div
+      className={cn(
+        "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+        isActive
+          ? "bg-blue-500/20 text-blue-400"
+          : "bg-slate-800/50 text-slate-400 group-hover:bg-slate-700/50 group-hover:text-slate-200"
+      )}
+    >
+      <item.icon className="w-5 h-5" />
+    </div>
+    
+    {!collapsed && (
+      <div className="flex-1 min-w-0">
+        <p className={cn(
+          "font-medium text-sm truncate",
+          isActive ? "text-blue-400" : "text-slate-200"
+        )}>
+          {item.title}
+        </p>
+      </div>
+    )}
+  </NavLink>
+));
+
+MenuItem.displayName = 'MenuItem';
+
+export const AppSidebar = memo(() => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -92,25 +134,18 @@ export const AppSidebar = () => {
         collapsed ? "w-20" : "w-64"
       )}
     >
-      {/* Logo Section */}
+      {/* Logo Section - CSS icon instead of image */}
       <div className="p-4 border-b border-slate-800/50">
         <div className="flex items-center gap-3">
-          {/* University Logo with Glow */}
           <div className="relative flex-shrink-0">
-            <div className="w-12 h-12 rounded-xl overflow-hidden shadow-glow-orange border-2 border-orange-500/30">
-              <img 
-                src={periyarLogo} 
-                alt="Periyar University Logo" 
-                loading="eager"
-                fetchPriority="high"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/10 border-2 border-orange-500/30 flex items-center justify-center">
+              <Bot className="w-6 h-6 text-orange-400" />
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse-soft" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900" />
           </div>
           
           {!collapsed && (
-            <div className="fade-in">
+            <div>
               <h1 className="font-bold text-slate-100">Periyar Uni</h1>
               <p className="text-xs text-slate-400">STUDENT PORTAL</p>
             </div>
@@ -127,45 +162,14 @@ export const AppSidebar = () => {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200",
-                "hover:bg-slate-800/60 group",
-                isActive
-                  ? "bg-gradient-to-r from-blue-500/20 to-blue-600/10 border border-blue-500/30 text-blue-400"
-                  : "text-slate-400 hover:text-slate-200"
-              )}
-            >
-              <div
-                className={cn(
-                  "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-all",
-                  isActive
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-slate-800/50 text-slate-400 group-hover:bg-slate-700/50 group-hover:text-slate-200"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-              </div>
-              
-              {!collapsed && (
-                <div className="flex-1 min-w-0 fade-in">
-                  <p className={cn(
-                    "font-medium text-sm truncate",
-                    isActive ? "text-blue-400" : "text-slate-200"
-                  )}>
-                    {item.title}
-                  </p>
-                </div>
-              )}
-            </NavLink>
-          );
-        })}
+        {menuItems.map((item) => (
+          <MenuItem
+            key={item.path}
+            item={item}
+            isActive={location.pathname === item.path}
+            collapsed={collapsed}
+          />
+        ))}
 
         {/* Account Section */}
         {!collapsed && (
@@ -199,7 +203,7 @@ export const AppSidebar = () => {
                 </div>
                 
                 {!collapsed && (
-                  <div className="flex-1 min-w-0 fade-in">
+                  <div className="flex-1 min-w-0">
                     <p className={cn(
                       "font-medium text-sm truncate",
                       location.pathname === "/admin" ? "text-orange-400" : "text-slate-200"
@@ -223,7 +227,7 @@ export const AppSidebar = () => {
               </div>
               
               {!collapsed && (
-                <div className="flex-1 min-w-0 fade-in text-left">
+                <div className="flex-1 min-w-0 text-left">
                   <p className="font-medium text-sm truncate text-slate-200 group-hover:text-red-400">
                     Sign Out
                   </p>
@@ -255,7 +259,7 @@ export const AppSidebar = () => {
             </div>
             
             {!collapsed && (
-              <div className="flex-1 min-w-0 fade-in">
+              <div className="flex-1 min-w-0">
                 <p className={cn(
                   "font-medium text-sm truncate",
                   location.pathname === "/auth" ? "text-green-400" : "text-slate-200"
@@ -271,13 +275,13 @@ export const AppSidebar = () => {
       {/* Direct Support Section */}
       {!collapsed && (
         <div className="p-4 mt-auto border-t border-slate-800/50">
-          <div className="glass-dark rounded-xl p-4">
+          <div className="bg-slate-800/40 rounded-xl p-4 border border-slate-700/30">
             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Direct Support</p>
             <p className="text-xs text-slate-400 mb-1">Admin Office:</p>
             <p className="text-sm font-semibold text-slate-200 mb-3">0427-2345766</p>
             <button
               onClick={handleCallNow}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-slate-950 font-semibold text-sm hover:from-orange-400 hover:to-orange-500 transition-all shadow-glow-orange"
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 text-slate-950 font-semibold text-sm hover:from-orange-400 hover:to-orange-500 transition-all"
             >
               <Phone className="w-4 h-4" />
               Call Now
@@ -306,6 +310,8 @@ export const AppSidebar = () => {
       </div>
     </aside>
   );
-};
+});
+
+AppSidebar.displayName = 'AppSidebar';
 
 export default AppSidebar;
