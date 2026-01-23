@@ -20,8 +20,8 @@ export const FloatingAIButton = () => {
         <img 
           src={periyarLogo} 
           alt="AI Assistant" 
-          loading="lazy"
-          decoding="async"
+          loading="eager"
+          fetchPriority="low"
           className="w-10 h-10 rounded-full object-cover group-hover:scale-110 transition-transform"
         />
         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />

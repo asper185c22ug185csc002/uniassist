@@ -17,16 +17,17 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-orange-600/5 rounded-full blur-3xl" style={{ animationDelay: "2s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-slate-800/20 rounded-full blur-3xl" />
         
-        {/* Watermark Logo */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.02]">
-          <img 
-            src={periyarLogo} 
-            alt="" 
-            loading="lazy"
-            decoding="async"
-            className="w-[500px] h-[500px] object-contain"
-          />
-        </div>
+        {/* Watermark Logo - CSS background to avoid LCP impact */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.02]"
+          style={{ 
+            backgroundImage: `url(${periyarLogo})`,
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center'
+          }}
+          aria-hidden="true"
+        />
         
         {/* Grid Pattern */}
         <div 
