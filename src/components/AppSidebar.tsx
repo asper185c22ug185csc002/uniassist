@@ -101,6 +101,8 @@ export const AppSidebar = () => {
               <img 
                 src={periyarLogo} 
                 alt="Periyar University Logo" 
+                loading="eager"
+                fetchPriority="high"
                 className="w-full h-full object-cover"
               />
             </div>

@@ -315,6 +315,8 @@ export const ChatInterface = () => {
               <img 
                 src={periyarLogo} 
                 alt="Periyar University" 
+                loading="eager"
+                fetchPriority="high"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -390,6 +392,8 @@ export const ChatInterface = () => {
                   <img 
                     src={periyarLogo} 
                     alt="Periyar University" 
+                    loading="eager"
+                    fetchPriority="high"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -462,6 +466,7 @@ export const ChatInterface = () => {
                       <img 
                         src={periyarLogo} 
                         alt="UniAssist AI" 
+                        loading="lazy"
                         className="w-full h-full object-cover"
                       />
                     )}
