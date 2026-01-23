@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Layout from '@/components/Layout';
@@ -23,6 +23,9 @@ import {
   Mountain,
   Camera
 } from 'lucide-react';
+
+// Lazy load the Salem companies component
+const SalemCompanies = lazy(() => import('@/components/SalemCompanies'));
 
 // Import generated tour images
 import munnarTeaGardens from '@/assets/munnar-tea-gardens.jpg';
@@ -352,6 +355,8 @@ const Internships = () => {
                       <img 
                         src={getTourImage(iv.destination)} 
                         alt={iv.destination}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -421,6 +426,15 @@ const Internships = () => {
             </div>
           )}
         </div>
+
+        {/* Salem Companies Section - Lazy Loaded */}
+        <Suspense fallback={
+          <div className="mt-12 flex justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        }>
+          <SalemCompanies />
+        </Suspense>
 
         {/* Apply Section */}
         <Card className="mt-12">

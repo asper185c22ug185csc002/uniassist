@@ -22,6 +22,8 @@ export const Layout = ({ children }: LayoutProps) => {
           <img 
             src={periyarLogo} 
             alt="" 
+            loading="lazy"
+            decoding="async"
             className="w-[500px] h-[500px] object-contain"
           />
         </div>
