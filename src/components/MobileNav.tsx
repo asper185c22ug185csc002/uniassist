@@ -1,4 +1,3 @@
-import { memo } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   HelpCircle,
@@ -17,7 +16,7 @@ const menuItems = [
   { title: "Contact", icon: Phone, path: "/contact" },
 ];
 
-export const MobileNav = memo(() => {
+export const MobileNav = () => {
   const location = useLocation();
 
   return (
@@ -56,8 +55,6 @@ export const MobileNav = memo(() => {
       </div>
     </nav>
   );
-});
-
-MobileNav.displayName = 'MobileNav';
+};
 
 export default MobileNav;

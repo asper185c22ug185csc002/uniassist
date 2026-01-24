@@ -215,5 +215,3 @@ export const ChatHistorySidebar = ({
     </>
   );
 };
-
-export default ChatHistorySidebar;

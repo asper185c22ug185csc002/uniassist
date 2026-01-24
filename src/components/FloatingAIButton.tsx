@@ -1,10 +1,9 @@
-import { memo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MessageCircle, Bot } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import periyarLogo from '@/assets/periyar-logo.jpg';
 
-// Memoize to prevent unnecessary re-renders
-export const FloatingAIButton = memo(() => {
+export const FloatingAIButton = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -18,16 +17,17 @@ export const FloatingAIButton = memo(() => {
       title="Ask AI Assistant"
     >
       <div className="relative w-full h-full flex items-center justify-center">
-        {/* Use CSS icon instead of image for better LCP */}
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500/30 to-orange-600/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-          <Bot className="w-5 h-5 text-orange-300" />
-        </div>
+        <img 
+          src={periyarLogo} 
+          alt="AI Assistant" 
+          loading="eager"
+          fetchPriority="low"
+          className="w-10 h-10 rounded-full object-cover group-hover:scale-110 transition-transform"
+        />
         <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
       </div>
     </Button>
   );
-});
-
-FloatingAIButton.displayName = 'FloatingAIButton';
+};
 
 export default FloatingAIButton;
