@@ -110,12 +110,12 @@ const Alumni = () => {
     address?: string | null;
   };
 
-  // Fetch approved alumni - use public view for anonymous users (hides email, phone, DOB, address)
+  // Fetch approved alumni - only admins see full data, everyone else uses public view
   const { data: alumni, isLoading, refetch: refetchAlumni } = useQuery<AlumniData[]>({
-    queryKey: ['approved_alumni', isAuthenticated],
+    queryKey: ['approved_alumni', isAdmin],
     queryFn: async () => {
-      if (isAuthenticated) {
-        // Authenticated users can see full data
+      if (isAdmin) {
+        // Admins can see full data including PII
         const { data, error } = await supabase
           .from('alumni')
           .select('*')
@@ -124,7 +124,7 @@ const Alumni = () => {
         if (error) throw error;
         return data as AlumniData[];
       } else {
-        // Anonymous users see public view without sensitive info
+        // All non-admin users (including authenticated) see public view without sensitive info
         const { data, error } = await supabase
           .from('alumni_public' as any)
           .select('*')
