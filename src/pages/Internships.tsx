@@ -94,12 +94,12 @@ const Internships = () => {
   const { isAdmin, user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Use full table for authenticated users, public view for anonymous
+  // Only admins see full table with contact info, everyone else uses public view
   const { data: internshipAreas, isLoading } = useQuery<InternshipAreaData[]>({
-    queryKey: ['internship_areas', !!user],
+    queryKey: ['internship_areas', isAdmin],
     queryFn: async () => {
-      if (user) {
-        // Authenticated users can see full data including contact info
+      if (isAdmin) {
+        // Admins can see full data including contact info
         const { data, error } = await supabase
           .from('internship_areas')
           .select('*')
@@ -107,7 +107,7 @@ const Internships = () => {
         if (error) throw error;
         return data as InternshipAreaData[];
       } else {
-        // Anonymous users see public view without sensitive contact info
+        // All non-admin users see public view without sensitive contact info
         const { data, error } = await supabase
           .from('internship_areas_public' as any)
           .select('*')
@@ -118,11 +118,11 @@ const Internships = () => {
     },
   });
 
-  // Use full table for authenticated users, public view for anonymous
+  // Only admins see full table, everyone else uses public view
   const { data: industrialVisits, isLoading: ivLoading } = useQuery<IndustrialVisitData[]>({
-    queryKey: ['industrial_visits', !!user],
+    queryKey: ['industrial_visits', isAdmin],
     queryFn: async () => {
-      if (user) {
+      if (isAdmin) {
         const { data, error } = await supabase
           .from('industrial_visits')
           .select('*')
